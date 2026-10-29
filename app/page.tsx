@@ -10,6 +10,7 @@ import { properties, quickFilters } from "@/lib/properties"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Toggle } from "@/components/ui/toggle"
 import { TooltipProvider } from "@/components/ui/tooltip"
 
@@ -21,6 +22,13 @@ function matchesQuickFilter(property: (typeof properties)[number], filterId: str
   return filterId === "owner" ? property.advertiser === "owner" : property.zones.includes(filterId)
 }
 
+const locationGroups = quickFilters
+  .filter((filter) => filter.id.startsWith("region-"))
+  .map((region) => ({
+    ...region,
+    neighborhoods: [...new Set(properties.filter((property) => property.zones.includes(region.id)).map((property) => property.neighborhood))].sort((a, b) => a.localeCompare(b, "pt-BR")),
+  }))
+
 export default function Home() {
   const [searchInput, setSearchInput] = useState("")
   const [query, setQuery] = useState("")
@@ -28,6 +36,8 @@ export default function Home() {
   const [showTotal, setShowTotal] = useState(false)
   const [searchError, setSearchError] = useState("")
   const [visibleCount, setVisibleCount] = useState(12)
+  const [selectedRegion, setSelectedRegion] = useState("")
+  const [selectedNeighborhood, setSelectedNeighborhood] = useState("all")
 
   const filteredProperties = useMemo(() => {
     const search = normalize(query.trim())
@@ -39,6 +49,7 @@ export default function Home() {
   }, [query, activeFilter])
 
   const visibleProperties = filteredProperties.slice(0, visibleCount)
+  const availableNeighborhoods = locationGroups.find((region) => region.id === selectedRegion)?.neighborhoods ?? []
   const scrollToResults = () => window.setTimeout(() => document.getElementById("imoveis")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80)
 
   const resetFilters = () => {
@@ -47,6 +58,8 @@ export default function Home() {
     setActiveFilter(null)
     setSearchError("")
     setVisibleCount(12)
+    setSelectedRegion("")
+    setSelectedNeighborhood("all")
   }
 
   const handleQuickFilter = (filterId: string) => {
@@ -56,13 +69,33 @@ export default function Home() {
     setSearchInput("")
     setSearchError("")
     setVisibleCount(12)
+    setSelectedRegion(nextFilter?.startsWith("region-") ? nextFilter : "")
+    setSelectedNeighborhood("all")
     const matchCount = nextFilter ? properties.filter((property) => matchesQuickFilter(property, nextFilter)).length : properties.length
     if (matchCount > 0) scrollToResults()
+  }
+
+  const handleLocationSearch = () => {
+    if (!selectedRegion) {
+      setSearchError("Escolha primeiro uma zona de Manaus para ver os bairros disponíveis.")
+      return
+    }
+
+    const region = locationGroups.find((item) => item.id === selectedRegion)
+    const neighborhood = selectedNeighborhood === "all" ? "" : selectedNeighborhood
+    setActiveFilter(neighborhood ? null : selectedRegion)
+    setQuery(neighborhood)
+    setSearchInput(neighborhood || region?.label || "")
+    setSearchError("")
+    setVisibleCount(12)
+    scrollToResults()
   }
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const term = searchInput.trim()
+    setSelectedRegion("")
+    setSelectedNeighborhood("all")
     if (!term) {
       resetFilters()
       scrollToResults()
@@ -111,6 +144,26 @@ export default function Home() {
                   <Button type="submit" className="size-11 shrink-0 rounded-2xl bg-[#063f2e] p-0 text-white hover:bg-[#0B513B] sm:h-12 sm:w-auto sm:px-5" aria-label="Buscar imóveis"><Search className="size-5" /><span className="hidden font-extrabold sm:inline">Buscar</span></Button>
                 </form>
                 <div id="search-feedback" aria-live="polite" className="min-h-6 max-w-xl pt-3">{searchError && <p role="alert" className="flex items-start gap-2 rounded-2xl bg-[#FFF0CE] px-4 py-3 text-sm font-bold text-[#7A4A00]"><Search className="mt-0.5 size-4 shrink-0" />{searchError}</p>}</div>
+
+                <div className="mt-3 max-w-xl rounded-[20px] border border-[#063f2e]/12 bg-white/65 p-3.5">
+                  <p className="mb-2.5 text-[11px] font-extrabold uppercase tracking-[0.1em] text-[#60776e]">Ou escolha pela lista</p>
+                  <div className="grid gap-2 sm:grid-cols-[1fr_1.25fr_auto]">
+                    <Select value={selectedRegion} onValueChange={(value) => { setSelectedRegion(value); setSelectedNeighborhood("all"); setSearchError("") }}>
+                      <SelectTrigger className="h-11 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Escolher zona de Manaus"><SelectValue placeholder="Escolha a zona" /></SelectTrigger>
+                      <SelectContent className="border-[#063f2e]/10 bg-[#FFFDF7]">
+                        {locationGroups.map((region) => <SelectItem key={region.id} value={region.id}>{region.emoji} {region.label}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    <Select value={selectedNeighborhood} onValueChange={(value) => { setSelectedNeighborhood(value); setSearchError("") }} disabled={!selectedRegion}>
+                      <SelectTrigger className="h-11 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Escolher bairro"><SelectValue placeholder="Depois, escolha o bairro" /></SelectTrigger>
+                      <SelectContent className="border-[#063f2e]/10 bg-[#FFFDF7]">
+                        <SelectItem value="all">Todos os bairros da zona</SelectItem>
+                        {availableNeighborhoods.map((neighborhood) => <SelectItem key={neighborhood} value={neighborhood}>{neighborhood}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    <Button type="button" onClick={handleLocationSearch} className="h-11 rounded-xl bg-[#FFB72B] px-4 font-extrabold text-[#063f2e] shadow-none hover:bg-[#FFC44D]" aria-label="Buscar na localização selecionada">Ver imóveis</Button>
+                  </div>
+                </div>
 
                 <div className="mt-6 flex max-w-2xl flex-wrap gap-2" aria-label="Filtros rápidos">
                   {quickFilters.map((filter) => (
