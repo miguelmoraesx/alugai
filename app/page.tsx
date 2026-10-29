@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, type FormEvent } from "react"
 import { ArrowUpRight, Check, MapPin, Megaphone, Search, SlidersHorizontal } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { BrandLogo } from "@/components/brand-logo"
@@ -17,10 +17,17 @@ function normalize(value: string) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
 }
 
+function matchesQuickFilter(property: (typeof properties)[number], filterId: string) {
+  return filterId === "owner" ? property.advertiser === "owner" : property.zones.includes(filterId)
+}
+
 export default function Home() {
+  const [searchInput, setSearchInput] = useState("")
   const [query, setQuery] = useState("")
   const [activeFilter, setActiveFilter] = useState<string | null>(null)
   const [showTotal, setShowTotal] = useState(false)
+  const [searchError, setSearchError] = useState("")
+  const [visibleCount, setVisibleCount] = useState(12)
 
   const filteredProperties = useMemo(() => {
     const search = normalize(query.trim())
@@ -31,7 +38,59 @@ export default function Home() {
     })
   }, [query, activeFilter])
 
-  const resetFilters = () => { setQuery(""); setActiveFilter(null) }
+  const visibleProperties = filteredProperties.slice(0, visibleCount)
+  const scrollToResults = () => window.setTimeout(() => document.getElementById("imoveis")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80)
+
+  const resetFilters = () => {
+    setSearchInput("")
+    setQuery("")
+    setActiveFilter(null)
+    setSearchError("")
+    setVisibleCount(12)
+  }
+
+  const handleQuickFilter = (filterId: string) => {
+    const nextFilter = activeFilter === filterId ? null : filterId
+    setActiveFilter(nextFilter)
+    setQuery("")
+    setSearchInput("")
+    setSearchError("")
+    setVisibleCount(12)
+    const matchCount = nextFilter ? properties.filter((property) => matchesQuickFilter(property, nextFilter)).length : properties.length
+    if (matchCount > 0) scrollToResults()
+  }
+
+  const handleSearch = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const term = searchInput.trim()
+    if (!term) {
+      resetFilters()
+      scrollToResults()
+      return
+    }
+
+    const normalizedTerm = normalize(term)
+    const matchingFilter = quickFilters.find((filter) => normalize(filter.label).includes(normalizedTerm))
+    if (matchingFilter) {
+      setActiveFilter(matchingFilter.id)
+      setQuery("")
+      setSearchError("")
+      setVisibleCount(12)
+      scrollToResults()
+      return
+    }
+
+    const matches = properties.filter((property) => normalize(`${property.title} ${property.neighborhood}`).includes(normalizedTerm))
+    setActiveFilter(null)
+    setQuery(term)
+    setVisibleCount(12)
+    if (matches.length === 0) {
+      setSearchError(`Lugar não encontrado: “${term}”. Tente outro bairro ou escolha um dos filtros abaixo.`)
+      return
+    }
+    setSearchError("")
+    scrollToResults()
+  }
 
   return (
     <TooltipProvider>
@@ -45,15 +104,17 @@ export default function Home() {
                 <h1 className="max-w-2xl text-[3.25rem] font-black leading-[.94] tracking-[-0.065em] text-[#063f2e] sm:text-6xl lg:text-[4.9rem]">Um lugar em Manaus pra chamar de <span className="relative whitespace-nowrap">seu.<svg className="absolute -bottom-2 left-0 h-3 w-full text-[#FFB72B]" viewBox="0 0 220 14" preserveAspectRatio="none" aria-hidden="true"><path d="M3 10c46-8 133-8 214-4" fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="round" /></svg></span></h1>
                 <p className="mt-7 max-w-xl text-lg leading-relaxed text-[#48685c]">Aqui cabe o anúncio da imobiliária e o da dona da kitnet no Coroado. A gente organiza, mostra quem anunciou e deixa o custo bem claro.</p>
 
-                <div className="mt-8 flex max-w-xl items-center gap-2 rounded-[20px] border-2 border-[#063f2e] bg-white p-1.5 shadow-[5px_5px_0_#FFB72B]">
+                <form onSubmit={handleSearch} className="mt-8 flex max-w-xl items-center gap-2 rounded-[20px] border-2 border-[#063f2e] bg-white p-1.5 shadow-[5px_5px_0_#FFB72B]">
                   <MapPin className="ml-3 size-5 shrink-0 fill-[#FFB72B] text-[#063f2e]" />
-                  <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Qual bairro você procura?" aria-label="Buscar por bairro" className="h-12 border-0 bg-transparent px-2 text-base text-[#063f2e] shadow-none placeholder:text-[#789087] focus-visible:ring-0" />
-                  <Button className="size-11 shrink-0 rounded-2xl bg-[#063f2e] p-0 text-white hover:bg-[#0B513B] sm:h-12 sm:w-auto sm:px-5" aria-label="Buscar imóveis"><Search className="size-5" /><span className="hidden font-extrabold sm:inline">Buscar</span></Button>
-                </div>
+                  <Input value={searchInput} onChange={(event) => { setSearchInput(event.target.value); if (searchError) setSearchError("") }} list="bairros-manaus" placeholder="Qual bairro ou região?" aria-label="Buscar por bairro ou região" aria-describedby="search-feedback" className="h-12 border-0 bg-transparent px-2 text-base text-[#063f2e] shadow-none placeholder:text-[#789087] focus-visible:ring-0" />
+                  <datalist id="bairros-manaus">{properties.map((property) => <option key={property.id} value={property.neighborhood} />)}</datalist>
+                  <Button type="submit" className="size-11 shrink-0 rounded-2xl bg-[#063f2e] p-0 text-white hover:bg-[#0B513B] sm:h-12 sm:w-auto sm:px-5" aria-label="Buscar imóveis"><Search className="size-5" /><span className="hidden font-extrabold sm:inline">Buscar</span></Button>
+                </form>
+                <div id="search-feedback" aria-live="polite" className="min-h-6 max-w-xl pt-3">{searchError && <p role="alert" className="flex items-start gap-2 rounded-2xl bg-[#FFF0CE] px-4 py-3 text-sm font-bold text-[#7A4A00]"><Search className="mt-0.5 size-4 shrink-0" />{searchError}</p>}</div>
 
                 <div className="mt-6 flex max-w-2xl flex-wrap gap-2" aria-label="Filtros rápidos">
                   {quickFilters.map((filter) => (
-                    <button key={filter.id} type="button" onClick={() => setActiveFilter((current) => current === filter.id ? null : filter.id)} aria-pressed={activeFilter === filter.id} className={cn("rounded-full border px-3.5 py-2 text-xs font-bold transition", activeFilter === filter.id ? "border-[#063f2e] bg-[#063f2e] text-white" : "border-[#063f2e]/15 bg-white/60 text-[#315a4c] hover:border-[#FFB72B] hover:bg-[#FFB72B]/15")}><span className="mr-1.5" aria-hidden="true">{filter.emoji}</span>{filter.label}</button>
+                    <button key={filter.id} type="button" onClick={() => handleQuickFilter(filter.id)} aria-pressed={activeFilter === filter.id} className={cn("rounded-full border px-3.5 py-2 text-xs font-bold transition", activeFilter === filter.id ? "border-[#063f2e] bg-[#063f2e] text-white" : "border-[#063f2e]/15 bg-white/60 text-[#315a4c] hover:border-[#FFB72B] hover:bg-[#FFB72B]/15")}><span className="mr-1.5" aria-hidden="true">{filter.emoji}</span>{filter.label}</button>
                   ))}
                 </div>
               </div>
@@ -75,7 +136,7 @@ export default function Home() {
             </div>
           </section>
 
-          <section id="imoveis" className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+          <section id="imoveis" className="mx-auto max-w-7xl scroll-mt-24 px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
             <div className="mb-8 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
               <div>
                 <p className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#C57C00]"><SlidersHorizontal className="size-4" /> Achados de agora</p>
@@ -89,8 +150,8 @@ export default function Home() {
               </Toggle>
             </div>
 
-            {filteredProperties.length > 0 ? <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,.88fr)_minmax(0,1.12fr)]"><PropertyMap properties={filteredProperties} /><div className="grid gap-7 md:grid-cols-2">{filteredProperties.map((property) => <PropertyCard key={property.id} property={property} showTotal={showTotal} />)}</div></div> : (
-              <div className="rounded-[32px] border-2 border-dashed border-[#063f2e]/20 bg-[#FBF7EB] px-6 py-16 text-center"><span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#FFB72B]"><Search className="size-5" /></span><h2 className="mt-4 text-xl font-black">Esse cantinho ainda não apareceu.</h2><p className="mt-1 text-sm text-[#60776e]">Tente outro bairro ou volte para todos os imóveis.</p><Button onClick={resetFilters} className="mt-5 rounded-full bg-[#063f2e] font-bold">Ver todos</Button></div>
+            {filteredProperties.length > 0 ? <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,.88fr)_minmax(0,1.12fr)]"><PropertyMap properties={filteredProperties} /><div><div className="grid gap-7 md:grid-cols-2">{visibleProperties.map((property) => <PropertyCard key={property.id} property={property} showTotal={showTotal} />)}</div>{visibleCount < filteredProperties.length && <Button type="button" onClick={() => setVisibleCount((count) => count + 12)} variant="outline" className="mt-7 h-11 w-full rounded-full border-2 border-[#063f2e]/20 bg-[#FBF7EB] font-extrabold text-[#063f2e]">Carregar mais imóveis</Button>}</div></div> : (
+              <div className="rounded-[32px] border-2 border-dashed border-[#063f2e]/20 bg-[#FBF7EB] px-6 py-16 text-center"><span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#FFB72B]"><Search className="size-5" /></span><h2 className="mt-4 text-xl font-black">Lugar não encontrado</h2><p className="mt-1 text-sm text-[#60776e]">Ainda não temos imóveis nesse local. Tente outro bairro ou volte para todos.</p><Button onClick={() => { resetFilters(); scrollToResults() }} className="mt-5 rounded-full bg-[#063f2e] font-bold">Ver todos</Button></div>
             )}
           </section>
 

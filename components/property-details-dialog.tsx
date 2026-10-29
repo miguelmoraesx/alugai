@@ -30,7 +30,7 @@ export function PropertyDetailsDialog({ property }: { property: Property }) {
           <div className="bg-[#E8E4D8] p-3 sm:p-5">
             <div className="relative overflow-hidden rounded-[22px] bg-[#DAD5C7]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={property.images[photo]} alt={`${property.title} em ${property.neighborhood} — foto ampliada ${photo + 1}`} className="aspect-[4/3] size-full object-cover" />
+              <img src={property.images[photo]} alt={`${property.title} em ${property.neighborhood} — foto ampliada ${photo + 1}`} decoding="async" className="aspect-[4/3] size-full object-cover" />
               <button type="button" onClick={() => movePhoto(-1)} className="absolute left-3 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-[#FBF7EB]/95 text-[#063f2e] shadow-md" aria-label="Foto anterior"><ChevronLeft className="size-5" /></button>
               <button type="button" onClick={() => movePhoto(1)} className="absolute right-3 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-[#FBF7EB]/95 text-[#063f2e] shadow-md" aria-label="Próxima foto"><ChevronRight className="size-5" /></button>
               <span className="absolute bottom-3 right-3 rounded-full bg-[#063f2e]/80 px-3 py-1 text-xs font-bold text-white">{photo + 1} / {property.images.length}</span>
@@ -39,7 +39,7 @@ export function PropertyDetailsDialog({ property }: { property: Property }) {
               {property.images.map((image, index) => (
                 <button key={image} type="button" onClick={() => setPhoto(index)} className={cn("overflow-hidden rounded-xl border-2", photo === index ? "border-[#FFB72B]" : "border-transparent opacity-70 hover:opacity-100")} aria-label={`Abrir foto ${index + 1}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={image} alt="" className="aspect-[16/10] size-full object-cover" />
+                  <img src={image} alt="" loading="lazy" decoding="async" className="aspect-[16/10] size-full object-cover" />
                 </button>
               ))}
             </div>
