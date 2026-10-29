@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState, type FormEvent } from "react"
-import { ArrowUpRight, Check, MapPin, Megaphone, Search, SlidersHorizontal } from "lucide-react"
+import { ArrowUpRight, BedDouble, CarFront, Check, MapPin, Megaphone, PawPrint, Search, SlidersHorizontal, X } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { BrandLogo } from "@/components/brand-logo"
 import { PropertyCard } from "@/components/property-card"
@@ -38,18 +38,25 @@ export default function Home() {
   const [visibleCount, setVisibleCount] = useState(12)
   const [selectedRegion, setSelectedRegion] = useState("")
   const [selectedNeighborhood, setSelectedNeighborhood] = useState("all")
+  const [bedroomFilter, setBedroomFilter] = useState("any")
+  const [parkingFilter, setParkingFilter] = useState("any")
+  const [petOnly, setPetOnly] = useState(false)
 
   const filteredProperties = useMemo(() => {
     const search = normalize(query.trim())
     return properties.filter((property) => {
       const matchesSearch = !search || normalize(`${property.title} ${property.neighborhood}`).includes(search)
       const matchesZone = !activeFilter || (activeFilter === "owner" ? property.advertiser === "owner" : property.zones.includes(activeFilter))
-      return matchesSearch && matchesZone
+      const matchesBedrooms = bedroomFilter === "any" || (bedroomFilter === "3+" ? property.bedrooms >= 3 : property.bedrooms === Number(bedroomFilter))
+      const matchesParking = parkingFilter === "any" || (parkingFilter === "2+" ? property.parkingSpaces >= 2 : property.parkingSpaces >= Number(parkingFilter))
+      const matchesPet = !petOnly || property.petFriendly
+      return matchesSearch && matchesZone && matchesBedrooms && matchesParking && matchesPet
     })
-  }, [query, activeFilter])
+  }, [query, activeFilter, bedroomFilter, parkingFilter, petOnly])
 
   const visibleProperties = filteredProperties.slice(0, visibleCount)
   const availableNeighborhoods = locationGroups.find((region) => region.id === selectedRegion)?.neighborhoods ?? []
+  const hasBasicFilters = bedroomFilter !== "any" || parkingFilter !== "any" || petOnly
   const scrollToResults = () => window.setTimeout(() => document.getElementById("imoveis")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80)
 
   const resetFilters = () => {
@@ -60,6 +67,16 @@ export default function Home() {
     setVisibleCount(12)
     setSelectedRegion("")
     setSelectedNeighborhood("all")
+    setBedroomFilter("any")
+    setParkingFilter("any")
+    setPetOnly(false)
+  }
+
+  const clearBasicFilters = () => {
+    setBedroomFilter("any")
+    setParkingFilter("any")
+    setPetOnly(false)
+    setVisibleCount(12)
   }
 
   const handleQuickFilter = (filterId: string) => {
@@ -195,7 +212,7 @@ export default function Home() {
                 <p className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#C57C00]"><SlidersHorizontal className="size-4" /> Achados de agora</p>
                 <h2 className="text-3xl font-black tracking-[-0.045em] text-[#063f2e] sm:text-4xl">{filteredProperties.length === 1 ? "1 cantinho encontrado" : `${filteredProperties.length} cantinhos encontrados`}</h2>
                 <p className="mt-2 text-sm text-[#60776e]">Veja no mapa quem anuncia direto, por corretor ou em outra plataforma.</p>
-                {(query || activeFilter) && <button type="button" onClick={resetFilters} className="mt-2 text-xs font-bold text-[#0F7352] underline decoration-[#FFB72B] decoration-2 underline-offset-4">Limpar busca e ver tudo</button>}
+                {(query || activeFilter || hasBasicFilters) && <button type="button" onClick={resetFilters} className="mt-2 text-xs font-bold text-[#0F7352] underline decoration-[#FFB72B] decoration-2 underline-offset-4">Limpar busca e ver tudo</button>}
               </div>
               <Toggle pressed={showTotal} onPressedChange={setShowTotal} variant="outline" className="h-auto min-h-12 justify-start rounded-full border-2 border-[#063f2e]/15 bg-[#FBF7EB] px-4 py-2.5 text-left text-xs font-bold text-[#315a4c] shadow-none hover:bg-white data-[state=on]:border-[#063f2e] data-[state=on]:bg-[#063f2e] data-[state=on]:text-white sm:text-sm" aria-label="Exibir custo total mensal">
                 <span className={cn("relative h-6 w-10 shrink-0 rounded-full bg-[#C9C4B6] transition-colors", showTotal && "bg-[#FFB72B]")}><span className={cn("absolute left-1 top-1 size-4 rounded-full bg-white shadow-sm transition-transform", showTotal && "translate-x-4 bg-[#063f2e]")} /></span>
@@ -203,8 +220,33 @@ export default function Home() {
               </Toggle>
             </div>
 
+            <div className="mb-8 flex flex-col gap-3 rounded-[24px] border border-[#063f2e]/12 bg-[#FBF7EB] p-3.5 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-2 px-1 text-xs font-black uppercase tracking-[0.1em] text-[#60776e]"><SlidersHorizontal className="size-4 text-[#C57C00]" /> Refine os anúncios</div>
+              <div className="grid flex-1 gap-2 sm:grid-cols-3 lg:ml-auto lg:max-w-2xl">
+                <Select value={bedroomFilter} onValueChange={(value) => { setBedroomFilter(value); setVisibleCount(12) }}>
+                  <SelectTrigger className="h-10 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Filtrar por número de quartos"><BedDouble className="size-4 text-[#0F7352]" /><SelectValue /></SelectTrigger>
+                  <SelectContent className="border-[#063f2e]/10 bg-[#FFFDF7]">
+                    <SelectItem value="any">Quartos: qualquer</SelectItem>
+                    <SelectItem value="1">1 quarto</SelectItem>
+                    <SelectItem value="2">2 quartos</SelectItem>
+                    <SelectItem value="3+">3 quartos ou mais</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={parkingFilter} onValueChange={(value) => { setParkingFilter(value); setVisibleCount(12) }}>
+                  <SelectTrigger className="h-10 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Filtrar por vagas de garagem"><CarFront className="size-4 text-[#0F7352]" /><SelectValue /></SelectTrigger>
+                  <SelectContent className="border-[#063f2e]/10 bg-[#FFFDF7]">
+                    <SelectItem value="any">Garagem: qualquer</SelectItem>
+                    <SelectItem value="1">1 vaga ou mais</SelectItem>
+                    <SelectItem value="2+">2 vagas ou mais</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Toggle pressed={petOnly} onPressedChange={(pressed) => { setPetOnly(pressed); setVisibleCount(12) }} variant="outline" className="h-10 justify-start rounded-xl border-[#063f2e]/15 bg-white px-3 font-bold text-[#315a4c] shadow-none hover:bg-[#FFF8E8] data-[state=on]:border-[#FFB72B] data-[state=on]:bg-[#FFEDC4] data-[state=on]:text-[#063f2e]" aria-label="Mostrar somente imóveis que aceitam pet"><PawPrint className="size-4 text-[#0F7352]" /> Aceita pet</Toggle>
+              </div>
+              {hasBasicFilters && <Button type="button" onClick={clearBasicFilters} variant="ghost" className="h-9 justify-start rounded-full px-3 text-xs font-bold text-[#60776e] hover:bg-white hover:text-[#063f2e]"><X className="size-3.5" /> Limpar filtros</Button>}
+            </div>
+
             {filteredProperties.length > 0 ? <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,.88fr)_minmax(0,1.12fr)]"><PropertyMap properties={filteredProperties} /><div><div className="grid gap-7 md:grid-cols-2">{visibleProperties.map((property) => <PropertyCard key={property.id} property={property} showTotal={showTotal} />)}</div>{visibleCount < filteredProperties.length && <Button type="button" onClick={() => setVisibleCount((count) => count + 12)} variant="outline" className="mt-7 h-11 w-full rounded-full border-2 border-[#063f2e]/20 bg-[#FBF7EB] font-extrabold text-[#063f2e]">Carregar mais imóveis</Button>}</div></div> : (
-              <div className="rounded-[32px] border-2 border-dashed border-[#063f2e]/20 bg-[#FBF7EB] px-6 py-16 text-center"><span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#FFB72B]"><Search className="size-5" /></span><h2 className="mt-4 text-xl font-black">Lugar não encontrado</h2><p className="mt-1 text-sm text-[#60776e]">Ainda não temos imóveis nesse local. Tente outro bairro ou volte para todos.</p><Button onClick={() => { resetFilters(); scrollToResults() }} className="mt-5 rounded-full bg-[#063f2e] font-bold">Ver todos</Button></div>
+              <div className="rounded-[32px] border-2 border-dashed border-[#063f2e]/20 bg-[#FBF7EB] px-6 py-16 text-center"><span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#FFB72B]"><Search className="size-5" /></span><h2 className="mt-4 text-xl font-black">{hasBasicFilters ? "Nenhum imóvel com esses filtros" : "Lugar não encontrado"}</h2><p className="mt-1 text-sm text-[#60776e]">{hasBasicFilters ? "Tente reduzir a quantidade de filtros para encontrar mais opções." : "Ainda não temos imóveis nesse local. Tente outro bairro ou volte para todos."}</p><Button onClick={() => { resetFilters(); scrollToResults() }} className="mt-5 rounded-full bg-[#063f2e] font-bold">Ver todos</Button></div>
             )}
           </section>
 

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { BadgeCheck, Bath, BedDouble, ChevronLeft, ChevronRight, MapPin, MessageCircle, PawPrint, Square, UserRound } from "lucide-react"
+import { BadgeCheck, Bath, BedDouble, CarFront, ChevronLeft, ChevronRight, MapPin, MessageCircle, PawPrint, Square, UserRound } from "lucide-react"
 import type { Property } from "@/lib/properties"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -52,9 +52,10 @@ export function PropertyDetailsDialog({ property }: { property: Property }) {
               <DialogDescription className="flex items-center gap-1.5 text-sm font-semibold text-[#60776e]"><MapPin className="size-4 text-[#C57C00]" /> {property.neighborhood}, Manaus</DialogDescription>
             </DialogHeader>
 
-            <div className="my-6 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2">
+            <div className="my-6 grid grid-cols-2 gap-3 sm:grid-cols-5 lg:grid-cols-2">
               <Detail icon={BedDouble} label={`${property.bedrooms} ${property.bedrooms === 1 ? "quarto" : "quartos"}`} />
               <Detail icon={Bath} label={`${property.bathrooms} ${property.bathrooms === 1 ? "banheiro" : "banheiros"}`} />
+              <Detail icon={CarFront} label={property.parkingSpaces === 0 ? "Sem garagem" : `${property.parkingSpaces} ${property.parkingSpaces === 1 ? "vaga" : "vagas"}`} />
               <Detail icon={Square} label={`${property.area} m²`} />
               <Detail icon={PawPrint} label={property.petFriendly ? "Aceita pet" : "Pet? consulte"} />
             </div>

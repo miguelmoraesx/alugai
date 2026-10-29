@@ -6,6 +6,7 @@ Metabuscador regional de aluguel residencial em Manaus. O MVP reúne imóveis an
 
 - Busca por bairro, zona e pontos de interesse de Manaus
 - Filtros rápidos para UFAM, UEA, Polo Industrial e regiões da cidade
+- Filtros por quartos, vagas de garagem e imóveis que aceitam pet
 - Mapa interativo com carregamento sob demanda
 - Identificação da origem e do tipo de anunciante
 - Comparação entre aluguel e custo mensal total

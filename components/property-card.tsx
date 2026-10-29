@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Bath, BedDouble, Building2, Check, ChevronLeft, ChevronRight, Heart, Layers3, MessageCircle, PawPrint, Square, UserRound } from "lucide-react"
+import { Bath, BedDouble, Building2, CarFront, Check, ChevronLeft, ChevronRight, Heart, Layers3, MessageCircle, PawPrint, Square, UserRound } from "lucide-react"
 import type { Property } from "@/lib/properties"
 import { PropertyDetailsDialog } from "@/components/property-details-dialog"
 import { cn } from "@/lib/utils"
@@ -49,6 +49,7 @@ export function PropertyCard({ property, showTotal }: { property: Property; show
         <div className="mb-4 flex flex-wrap gap-x-3 gap-y-2 text-[#526d63]">
           <Spec icon={BedDouble} value={`${property.bedrooms} ${property.bedrooms === 1 ? "quarto" : "quartos"}`} />
           <Spec icon={Bath} value={`${property.bathrooms} ${property.bathrooms === 1 ? "banheiro" : "banheiros"}`} />
+          <Spec icon={CarFront} value={property.parkingSpaces === 0 ? "Sem garagem" : `${property.parkingSpaces} ${property.parkingSpaces === 1 ? "vaga" : "vagas"}`} />
           <Spec icon={Square} value={`${property.area} m²`} />
           <Spec icon={PawPrint} value={property.petFriendly ? "Aceita pet" : "Pet? consulte"} />
         </div>
