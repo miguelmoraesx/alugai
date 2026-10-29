@@ -5,6 +5,7 @@ import { ArrowUpRight, Check, MapPin, Search, ShieldCheck, SlidersHorizontal } f
 import { SiteHeader } from "@/components/site-header"
 import { BrandLogo } from "@/components/brand-logo"
 import { PropertyCard } from "@/components/property-card"
+import { PropertyMap } from "@/components/property-map"
 import { properties, quickFilters } from "@/lib/properties"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -42,7 +43,7 @@ export default function Home() {
               <div>
                 <p className="mb-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-[#0F7352]"><span className="h-2 w-8 rounded-full bg-[#FFB72B]" /> Feito em Manaus, pra Manaus</p>
                 <h1 className="max-w-2xl text-[3.25rem] font-black leading-[.94] tracking-[-0.065em] text-[#063f2e] sm:text-6xl lg:text-[4.9rem]">Um lugar em Manaus pra chamar de <span className="relative whitespace-nowrap">seu.<svg className="absolute -bottom-2 left-0 h-3 w-full text-[#FFB72B]" viewBox="0 0 220 14" preserveAspectRatio="none" aria-hidden="true"><path d="M3 10c46-8 133-8 214-4" fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="round" /></svg></span></h1>
-                <p className="mt-7 max-w-xl text-lg leading-relaxed text-[#48685c]">A gente junta os aluguéis da cidade, confere a procedência e mostra o custo de verdade. Você só escolhe onde quer morar.</p>
+                <p className="mt-7 max-w-xl text-lg leading-relaxed text-[#48685c]">Aqui cabe o anúncio da imobiliária e o da dona da kitnet no Coroado. A gente organiza, mostra quem anunciou e deixa o custo bem claro.</p>
 
                 <div className="mt-8 flex max-w-xl items-center gap-2 rounded-[20px] border-2 border-[#063f2e] bg-white p-1.5 shadow-[5px_5px_0_#FFB72B]">
                   <MapPin className="ml-3 size-5 shrink-0 fill-[#FFB72B] text-[#063f2e]" />
@@ -79,7 +80,7 @@ export default function Home() {
               <div>
                 <p className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#C57C00]"><SlidersHorizontal className="size-4" /> Achados de agora</p>
                 <h2 className="text-3xl font-black tracking-[-0.045em] text-[#063f2e] sm:text-4xl">{filteredProperties.length === 1 ? "1 cantinho encontrado" : `${filteredProperties.length} cantinhos encontrados`}</h2>
-                <p className="mt-2 text-sm text-[#60776e]">Atualizados para quem está procurando em Manaus.</p>
+                <p className="mt-2 text-sm text-[#60776e]">Veja no mapa quem anuncia direto e quem é corretor verificado.</p>
                 {(query || activeFilter) && <button type="button" onClick={resetFilters} className="mt-2 text-xs font-bold text-[#0F7352] underline decoration-[#FFB72B] decoration-2 underline-offset-4">Limpar busca e ver tudo</button>}
               </div>
               <Toggle pressed={showTotal} onPressedChange={setShowTotal} variant="outline" className="h-auto min-h-12 justify-start rounded-full border-2 border-[#063f2e]/15 bg-[#FBF7EB] px-4 py-2.5 text-left text-xs font-bold text-[#315a4c] shadow-none hover:bg-white data-[state=on]:border-[#063f2e] data-[state=on]:bg-[#063f2e] data-[state=on]:text-white sm:text-sm" aria-label="Exibir custo total mensal">
@@ -88,7 +89,7 @@ export default function Home() {
               </Toggle>
             </div>
 
-            {filteredProperties.length > 0 ? <div className="grid gap-7 md:grid-cols-2 xl:grid-cols-3">{filteredProperties.map((property) => <PropertyCard key={property.id} property={property} showTotal={showTotal} />)}</div> : (
+            {filteredProperties.length > 0 ? <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,.88fr)_minmax(0,1.12fr)]"><PropertyMap properties={filteredProperties} /><div className="grid gap-7 md:grid-cols-2">{filteredProperties.map((property) => <PropertyCard key={property.id} property={property} showTotal={showTotal} />)}</div></div> : (
               <div className="rounded-[32px] border-2 border-dashed border-[#063f2e]/20 bg-[#FBF7EB] px-6 py-16 text-center"><span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#FFB72B]"><Search className="size-5" /></span><h2 className="mt-4 text-xl font-black">Esse cantinho ainda não apareceu.</h2><p className="mt-1 text-sm text-[#60776e]">Tente outro bairro ou volte para todos os imóveis.</p><Button onClick={resetFilters} className="mt-5 rounded-full bg-[#063f2e] font-bold">Ver todos</Button></div>
             )}
           </section>
@@ -109,11 +110,11 @@ export default function Home() {
           <section id="verificacao" className="bg-[#FBF7EB] py-16 sm:py-20">
             <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-20 lg:px-8">
               <div className="relative rounded-[36px] bg-[#FFB72B] p-8 text-[#063f2e] sm:p-10">
-                <ShieldCheck className="size-14" strokeWidth={1.8} /><p className="mt-8 text-3xl font-black leading-tight tracking-[-0.045em] sm:text-4xl">Anúncio bom começa com origem conhecida.</p><div className="absolute -right-3 -top-3 size-10 rounded-full border-[8px] border-[#0F7352]" />
+                <ShieldCheck className="size-14" strokeWidth={1.8} /><p className="mt-8 text-3xl font-black leading-tight tracking-[-0.045em] sm:text-4xl">O imóvel pode ser informal. A informação, não.</p><div className="absolute -right-3 -top-3 size-10 rounded-full border-[8px] border-[#0F7352]" />
               </div>
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#0F7352]">Nossa checagem</p><h2 className="mt-3 text-3xl font-black tracking-[-0.045em] text-[#063f2e]">Antes de você chamar, a gente olha.</h2><p className="mt-4 leading-relaxed text-[#60776e]">Cada card deixa claro de onde o anúncio veio. Também conferimos dados essenciais e destacamos profissionais com CRECI verificado.</p>
-                <div className="mt-7 grid gap-4">{["A fonte aparece sem letrinha escondida", "Aluguel, condomínio e IPTU ficam separados", "Cada conversa leva o código certo do imóvel"].map((item) => <div key={item} className="flex items-center gap-3 font-bold text-[#315a4c]"><span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#FFB72B]"><Check className="size-4 stroke-[3]" /></span>{item}</div>)}</div>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#0F7352]">Nossa checagem</p><h2 className="mt-3 text-3xl font-black tracking-[-0.045em] text-[#063f2e]">Proprietário direto é bem-vindo.</h2><p className="mt-4 leading-relaxed text-[#60776e]">Boa parte da oferta perto da UFAM e em bairros como Coroado circula no boca a boca. O Alugaí traz esses imóveis para o mapa e identifica claramente quem está do outro lado.</p>
+                <div className="mt-7 grid gap-4">{["Proprietário direto ganha identificação própria", "Corretor recebe selo somente com CRECI verificado", "A origem, os custos e o contato ficam transparentes"].map((item) => <div key={item} className="flex items-center gap-3 font-bold text-[#315a4c]"><span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#FFB72B]"><Check className="size-4 stroke-[3]" /></span>{item}</div>)}</div>
               </div>
             </div>
           </section>

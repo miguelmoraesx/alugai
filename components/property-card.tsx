@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Bath, BedDouble, Check, ChevronLeft, ChevronRight, Heart, MessageCircle, PawPrint, ShieldCheck, Square } from "lucide-react"
+import { BadgeCheck, Bath, BedDouble, Check, ChevronLeft, ChevronRight, Heart, MessageCircle, PawPrint, ShieldCheck, Square, UserRound } from "lucide-react"
 import type { Property } from "@/lib/properties"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -17,14 +17,23 @@ export function PropertyCard({ property, showTotal }: { property: Property; show
   const whatsappText = `Olá! Vi o imóvel #${property.id} (${property.neighborhood}) no Alugaí e quero agendar uma visita.`
   const whatsappUrl = `https://wa.me/5592999999999?text=${encodeURIComponent(whatsappText)}`
   const moveImage = (direction: number) => setImageIndex((current) => (current + direction + property.images.length) % property.images.length)
+  const isOwner = property.advertiser === "owner"
+  const isBroker = property.advertiser === "broker"
+  const contactLabel = isOwner ? "Falar com proprietário" : isBroker ? "Falar com corretor" : "Pedir contato no WhatsApp"
 
   return (
-    <Card className="group gap-0 overflow-hidden rounded-[26px] border-[#063f2e]/12 bg-[#FFFDF7] py-0 shadow-[0_6px_0_rgba(6,63,46,0.04)] transition duration-300 hover:-translate-y-1 hover:border-[#063f2e]/25 hover:shadow-[0_12px_0_rgba(6,63,46,0.07)]">
+    <Card id={property.id} className="group scroll-mt-28 gap-0 overflow-hidden rounded-[26px] border-[#063f2e]/12 bg-[#FFFDF7] py-0 shadow-[0_6px_0_rgba(6,63,46,0.04)] transition duration-300 hover:-translate-y-1 hover:border-[#063f2e]/25 hover:shadow-[0_12px_0_rgba(6,63,46,0.07)]">
       <div className="relative aspect-[4/3] overflow-hidden bg-[#E8E4D8]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={property.images[imageIndex]} alt={`${property.title} em ${property.neighborhood} — foto ${imageIndex + 1}`} className="size-full object-cover transition-transform duration-700 group-hover:scale-[1.025]" />
         <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#032b20]/45 to-transparent" />
-        <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-[#063f2e] px-3 py-1.5 text-[10px] font-extrabold text-white shadow-sm"><ShieldCheck className="size-3.5 text-[#FFB72B]" /> Checado pelo Alugaí</div>
+        {isOwner ? (
+          <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-[#FFB72B] px-3 py-1.5 text-[10px] font-extrabold text-[#063f2e] shadow-sm"><UserRound className="size-3.5" /> Direto com proprietário</div>
+        ) : isBroker ? (
+          <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-[#0F7352] px-3 py-1.5 text-[10px] font-extrabold text-white shadow-sm"><BadgeCheck className="size-3.5 text-[#FFB72B]" /> Corretor · CRECI verificado</div>
+        ) : (
+          <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-[#596B64] px-3 py-1.5 text-[10px] font-extrabold text-white shadow-sm"><ShieldCheck className="size-3.5 text-[#FFB72B]" /> Origem checada</div>
+        )}
         <button type="button" onClick={() => setFavorite((value) => !value)} className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full bg-[#FBF7EB] text-[#063f2e] shadow-sm transition hover:scale-105" aria-label={favorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}><Heart className={cn("size-[17px]", favorite && "fill-[#FFB72B] text-[#FFB72B]")} /></button>
         <button type="button" onClick={() => moveImage(-1)} className="absolute left-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-[#FBF7EB]/95 text-[#063f2e] opacity-0 transition group-hover:opacity-100 focus:opacity-100" aria-label="Foto anterior"><ChevronLeft className="size-4" /></button>
         <button type="button" onClick={() => moveImage(1)} className="absolute right-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-[#FBF7EB]/95 text-[#063f2e] opacity-0 transition group-hover:opacity-100 focus:opacity-100" aria-label="Próxima foto"><ChevronRight className="size-4" /></button>
@@ -53,7 +62,7 @@ export function PropertyCard({ property, showTotal }: { property: Property; show
         </div>
 
         <div className="my-4 flex items-center justify-between gap-3 text-[10px] text-[#71837c]"><span>Fonte: <strong className="text-[#315a4c]">{property.sourceLabel}</strong></span><span className="shrink-0 font-bold text-[#0F7352]">Disponível hoje</span></div>
-        <Button asChild className="h-11 w-full rounded-full bg-[#063f2e] font-extrabold text-white shadow-none transition hover:bg-[#0B513B]"><a href={whatsappUrl} target="_blank" rel="noreferrer"><MessageCircle className="size-4.5 text-[#FFB72B]" /> Chamar no WhatsApp</a></Button>
+        <Button asChild className="h-11 w-full rounded-full bg-[#063f2e] font-extrabold text-white shadow-none transition hover:bg-[#0B513B]"><a href={whatsappUrl} target="_blank" rel="noreferrer"><MessageCircle className="size-4.5 text-[#FFB72B]" /> {contactLabel}</a></Button>
       </CardContent>
     </Card>
   )

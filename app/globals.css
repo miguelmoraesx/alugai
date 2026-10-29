@@ -1,3 +1,4 @@
+@import "maplibre-gl/dist/maplibre-gl.css";
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "../vendor/shadcn-tailwind-4.13.0.css";
@@ -107,3 +108,38 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .brand-wordmark {
   font-family: ui-rounded, "Arial Rounded MT Bold", "Nunito Sans", Inter, ui-sans-serif, system-ui, sans-serif;
 }
+
+.alugai-map-marker {
+  border: 2px solid #fbf7eb;
+  border-radius: 999px 999px 999px 4px;
+  box-shadow: 0 4px 12px rgb(6 63 46 / 22%);
+  color: #fff;
+  cursor: pointer;
+  font: 800 11px/1 Inter, ui-sans-serif, system-ui, sans-serif;
+  padding: 8px 10px;
+  transform: rotate(-3deg);
+  transition: transform 160ms ease, box-shadow 160ms ease;
+  white-space: nowrap;
+}
+
+.alugai-map-marker span { display: block; transform: rotate(3deg); }
+.alugai-map-marker:hover { box-shadow: 0 7px 16px rgb(6 63 46 / 30%); transform: rotate(-3deg) translateY(-3px) scale(1.05); z-index: 5; }
+.alugai-map-marker--owner { background: #ffb72b; color: #063f2e; }
+.alugai-map-marker--broker { background: #0f7352; }
+.alugai-map-marker--aggregated { background: #6c7b76; }
+
+.alugai-landmark {
+  align-items: center;
+  background: #fbf7eb;
+  border: 1px solid rgb(6 63 46 / 18%);
+  border-radius: 10px;
+  color: #063f2e;
+  display: flex;
+  font: 800 10px/1 Inter, ui-sans-serif, system-ui, sans-serif;
+  gap: 4px;
+  padding: 5px 7px;
+  white-space: nowrap;
+}
+
+.maplibregl-ctrl-group { border-radius: 14px !important; box-shadow: 0 3px 12px rgb(6 63 46 / 14%) !important; overflow: hidden; }
+.maplibregl-ctrl-group button { background-color: #fbf7eb !important; }
