@@ -1,4 +1,4 @@
-@import "maplibre-gl/dist/maplibre-gl.css";
+@import "leaflet/dist/leaflet.css";
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "../vendor/shadcn-tailwind-4.13.0.css";
@@ -141,5 +141,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   white-space: nowrap;
 }
 
-.maplibregl-ctrl-group { border-radius: 14px !important; box-shadow: 0 3px 12px rgb(6 63 46 / 14%) !important; overflow: hidden; }
-.maplibregl-ctrl-group button { background-color: #fbf7eb !important; }
+.alugai-leaflet-marker-wrapper { background: transparent !important; border: 0 !important; }
+.leaflet-control-zoom { border: 0 !important; border-radius: 14px !important; box-shadow: 0 3px 12px rgb(6 63 46 / 14%) !important; overflow: hidden; }
+.leaflet-control-zoom a { background-color: #fbf7eb !important; border-color: rgb(6 63 46 / 10%) !important; color: #063f2e !important; }
+.leaflet-control-attribution { background: rgb(251 247 235 / 82%) !important; font-size: 9px !important; }

@@ -26,7 +26,7 @@ export default function Home() {
     const search = normalize(query.trim())
     return properties.filter((property) => {
       const matchesSearch = !search || normalize(`${property.title} ${property.neighborhood}`).includes(search)
-      const matchesZone = !activeFilter || property.zones.includes(activeFilter)
+      const matchesZone = !activeFilter || (activeFilter === "owner" ? property.advertiser === "owner" : property.zones.includes(activeFilter))
       return matchesSearch && matchesZone
     })
   }, [query, activeFilter])
