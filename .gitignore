@@ -12,10 +12,18 @@
 # Generated builds and framework state
 /dist/
 /.next/
-/.vinext/
 /out/
 next-env.d.ts
 *.tsbuildinfo
+
+# Local caches from development tools; never version these directories
+/.vinext/
+/.wrangler/
+/.sites-runtime/
+/outputs/
+/work/
+/.agents/
+/.codex/
 
 # Test output
 /coverage/
@@ -28,18 +36,7 @@ yarn-error.log*
 
 # Local environment and keys
 .env*
-.dev.vars*
 *.pem
-
-# Checkout-local tool state
-/.wrangler/
-/.sites-runtime/
-
-# Workspace scaffolding and publication archives
-/.agents/
-/.codex/
-/outputs/
-/work/
 
 # OS metadata
 .DS_Store
