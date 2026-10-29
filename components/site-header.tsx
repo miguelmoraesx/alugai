@@ -1,43 +1,41 @@
 "use client"
 
-import { Building2, Menu } from "lucide-react"
+import { ArrowUpRight, Building2 } from "lucide-react"
+import { BrandLogo } from "@/components/brand-logo"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
-      <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <a href="#inicio" className="group flex items-center gap-3" aria-label="Alugaí — início">
-          <span className="flex size-9 items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm shadow-emerald-200"><Building2 className="size-4.5" /></span>
-          <span className="relative text-xl font-bold tracking-[-0.04em] text-slate-950">Alugaí<span className="absolute -right-0.5 top-0 size-1.5 rounded-full bg-emerald-500" /></span>
-          <Badge variant="outline" className="hidden rounded-full border-slate-200 bg-slate-50 px-2.5 py-1 font-medium text-slate-500 sm:inline-flex">Manaus / AM</Badge>
-        </a>
-        <nav className="hidden items-center gap-8 text-sm font-medium text-slate-600 md:flex" aria-label="Navegação principal">
-          <a className="transition-colors hover:text-emerald-700" href="#como-funciona">Como funciona</a>
-          <a className="transition-colors hover:text-emerald-700" href="#verificacao">Sobre a verificação</a>
+    <header className="sticky top-0 z-40 border-b border-[#063f2e]/10 bg-[#FBF7EB]/95 backdrop-blur-md">
+      <div className="mx-auto flex h-[82px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <a href="#inicio" aria-label="Alugaí — início"><BrandLogo /></a>
+        <nav className="hidden items-center gap-7 text-[13px] font-bold text-[#315a4c] md:flex" aria-label="Navegação principal">
+          <a className="border-b-2 border-transparent py-2 transition-colors hover:border-[#FFB72B] hover:text-[#063f2e]" href="#imoveis">Imóveis</a>
+          <a className="border-b-2 border-transparent py-2 transition-colors hover:border-[#FFB72B] hover:text-[#063f2e]" href="#como-funciona">Como funciona</a>
+          <a className="border-b-2 border-transparent py-2 transition-colors hover:border-[#FFB72B] hover:text-[#063f2e]" href="#verificacao">Nossa checagem</a>
         </nav>
-        <div className="flex items-center gap-2">
-          <Dialog>
-            <DialogTrigger asChild><Button variant="outline" className="rounded-xl border-slate-300 bg-white font-semibold text-slate-800 shadow-xs hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-800"><span className="hidden sm:inline">Anunciar imóvel</span><span className="sm:hidden">Anunciar</span></Button></DialogTrigger>
-            <DialogContent className="rounded-2xl border-slate-200 bg-white p-0 sm:max-w-md">
-              <div className="rounded-t-2xl bg-emerald-50 px-6 py-5">
-                <span className="mb-4 flex size-10 items-center justify-center rounded-xl bg-emerald-600 text-white"><Building2 className="size-5" /></span>
-                <DialogHeader><DialogTitle className="text-xl text-slate-950">Anuncie com segurança</DialogTitle><DialogDescription className="text-slate-600">Deixe seus dados e nosso time fará a checagem do imóvel antes da publicação.</DialogDescription></DialogHeader>
-              </div>
-              <form className="grid gap-3 px-6 pb-6" onSubmit={(event) => event.preventDefault()}>
-                <Input aria-label="Seu nome" placeholder="Seu nome" className="h-11 rounded-xl border-slate-200" />
-                <Input aria-label="WhatsApp" placeholder="WhatsApp com DDD" className="h-11 rounded-xl border-slate-200" />
-                <Input aria-label="Bairro do imóvel" placeholder="Bairro do imóvel" className="h-11 rounded-xl border-slate-200" />
-                <Button className="mt-1 h-11 rounded-xl bg-emerald-600 font-semibold hover:bg-emerald-700">Quero anunciar</Button>
-                <p className="text-center text-xs text-slate-500">Sem custo para enviar. A publicação depende da verificação.</p>
-              </form>
-            </DialogContent>
-          </Dialog>
-          <Button variant="ghost" size="icon" className="md:hidden" aria-label="Abrir menu"><Menu className="size-5" /></Button>
-        </div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="h-11 rounded-full border-2 border-[#063f2e] bg-transparent px-4 font-extrabold text-[#063f2e] shadow-none hover:bg-[#063f2e] hover:text-[#FBF7EB] sm:px-5">
+              <span className="hidden sm:inline">Anunciar meu imóvel</span><span className="sm:hidden">Anunciar</span><ArrowUpRight className="size-4" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="overflow-hidden rounded-[28px] border-0 bg-[#FBF7EB] p-0 sm:max-w-md">
+            <div className="bg-[#FFB72B] px-6 py-6 text-[#063f2e]">
+              <span className="mb-4 flex size-11 items-center justify-center rounded-2xl bg-[#063f2e] text-[#FBF7EB]"><Building2 className="size-5" /></span>
+              <DialogHeader><DialogTitle className="text-2xl font-black tracking-[-0.04em]">Seu imóvel pode estar aqui.</DialogTitle><DialogDescription className="text-[#164c3a]">Conta pra gente o básico. A checagem acontece antes de o anúncio ir ao ar.</DialogDescription></DialogHeader>
+            </div>
+            <form className="grid gap-3 px-6 pb-6" onSubmit={(event) => event.preventDefault()}>
+              <Input aria-label="Seu nome" placeholder="Como podemos te chamar?" className="h-12 rounded-2xl border-[#063f2e]/15 bg-white" />
+              <Input aria-label="WhatsApp" placeholder="WhatsApp com DDD" className="h-12 rounded-2xl border-[#063f2e]/15 bg-white" />
+              <Input aria-label="Bairro do imóvel" placeholder="Em qual bairro fica?" className="h-12 rounded-2xl border-[#063f2e]/15 bg-white" />
+              <Button className="mt-1 h-12 rounded-full bg-[#063f2e] font-extrabold text-white hover:bg-[#0B513B]">Enviar para checagem</Button>
+              <p className="text-center text-xs text-[#60776e]">Sem custo e sem compromisso.</p>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </header>
   )
