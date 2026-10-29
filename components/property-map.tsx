@@ -1,14 +1,15 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { memo, useEffect, useRef, useState } from "react"
 import type { Map as LeafletMap, Marker as LeafletMarker } from "leaflet"
 import { MapPin, Navigation } from "lucide-react"
 import type { Property } from "@/lib/properties"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 })
 
-export function PropertyMap({ properties }: { properties: Property[] }) {
+export const PropertyMap = memo(function PropertyMap({ properties }: { properties: Property[] }) {
   const shellRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<LeafletMap | null>(null)
@@ -16,10 +17,25 @@ export function PropertyMap({ properties }: { properties: Property[] }) {
   const markersRef = useRef<LeafletMarker[]>([])
   const [shouldLoad, setShouldLoad] = useState(false)
   const [mapReady, setMapReady] = useState(false)
+  const [viewportReady, setViewportReady] = useState(false)
+  const [isCompactViewport, setIsCompactViewport] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const [selected, setSelected] = useState<Property | null>(properties[0] ?? null)
   const activeProperty = properties.find((property) => property.id === selected?.id) ?? properties[0] ?? null
 
   useEffect(() => {
+    const media = window.matchMedia("(max-width: 1279px)")
+    const updateViewport = () => {
+      setIsCompactViewport(media.matches)
+      setViewportReady(true)
+    }
+    updateViewport()
+    media.addEventListener("change", updateViewport)
+    return () => media.removeEventListener("change", updateViewport)
+  }, [])
+
+  useEffect(() => {
+    if (!viewportReady || (isCompactViewport && !expanded)) return
     const shell = shellRef.current
     if (!shell) return
     if (!("IntersectionObserver" in window)) {
@@ -35,7 +51,7 @@ export function PropertyMap({ properties }: { properties: Property[] }) {
     }, { rootMargin: "80px" })
     observer.observe(shell)
     return () => observer.disconnect()
-  }, [])
+  }, [expanded, isCompactViewport, viewportReady])
 
   useEffect(() => {
     if (!shouldLoad || !containerRef.current || mapRef.current) return
@@ -60,6 +76,8 @@ export function PropertyMap({ properties }: { properties: Property[] }) {
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "© OpenStreetMap",
         maxZoom: 17,
+        detectRetina: false,
+        updateWhenZooming: false,
         updateWhenIdle: true,
         keepBuffer: 1,
       }).addTo(map)
@@ -82,6 +100,11 @@ export function PropertyMap({ properties }: { properties: Property[] }) {
       mapRef.current = null
     }
   }, [shouldLoad])
+
+  useEffect(() => {
+    if (!mapReady || !expanded) return
+    requestAnimationFrame(() => mapRef.current?.invalidateSize())
+  }, [expanded, mapReady])
 
   useEffect(() => {
     if (!mapReady || !mapRef.current || !libraryRef.current) return
@@ -113,14 +136,14 @@ export function PropertyMap({ properties }: { properties: Property[] }) {
   }, [mapReady, properties])
 
   return (
-    <div ref={shellRef} className="sticky top-[98px] overflow-hidden rounded-[30px] border-2 border-[#063f2e]/15 bg-[#FBF7EB] shadow-[0_10px_0_rgba(6,63,46,.06)]">
+    <div ref={shellRef} className="overflow-hidden rounded-[30px] border-2 border-[#063f2e]/15 bg-[#FBF7EB] shadow-[0_10px_0_rgba(6,63,46,.06)] xl:sticky xl:top-[98px]">
       <div className="flex items-center justify-between gap-3 border-b border-[#063f2e]/10 px-5 py-4">
         <div><p className="flex items-center gap-2 text-sm font-black text-[#063f2e]"><Navigation className="size-4 fill-[#FFB72B]" /> Explore pelo mapa</p><p className="mt-0.5 text-[11px] text-[#60776e]">Arraste, aproxime e toque nos valores.</p></div>
         <div className="hidden gap-3 text-[9px] font-bold text-[#526d63] sm:flex"><Legend color="#FFB72B" label="Proprietário" /><Legend color="#0F7352" label="Corretor" /><Legend color="#6C7B76" label="Agregado" /></div>
       </div>
       <div className="relative">
-        <div ref={containerRef} className="h-[470px] w-full bg-[#E8E4D8] xl:h-[650px]" aria-label="Mapa de imóveis disponíveis em Manaus" />
-        {activeProperty && mapReady && (
+        <div ref={containerRef} className={cn("w-full bg-[#E8E4D8] transition-[height] duration-300 xl:h-[650px]", expanded ? "h-[470px]" : "h-[170px]")} aria-label="Mapa de imóveis disponíveis em Manaus" />
+        {activeProperty && mapReady && (!isCompactViewport || expanded) && (
           <div className="absolute inset-x-3 bottom-3 z-[500] rounded-[22px] border border-white/70 bg-[#FFFDF7]/95 p-4 shadow-xl backdrop-blur-md">
             <div className="flex items-start justify-between gap-3">
               <div><p className="text-[10px] font-black uppercase tracking-[.12em] text-[#C57C00]">{activeProperty.neighborhood}</p><p className="mt-1 font-black text-[#063f2e]">{activeProperty.title}</p><p className="mt-1 text-xs text-[#60776e]">{activeProperty.advertiser === "owner" ? "Direto com o proprietário" : activeProperty.advertiser === "broker" ? "Anunciado por corretor" : activeProperty.sourceLabel}</p></div>
@@ -129,11 +152,11 @@ export function PropertyMap({ properties }: { properties: Property[] }) {
             <Button asChild className="mt-3 h-9 w-full rounded-full bg-[#063f2e] text-xs font-extrabold hover:bg-[#0B513B]"><a href={`#${activeProperty.id}`}>Ver detalhes deste imóvel</a></Button>
           </div>
         )}
-        {!mapReady && <div className="absolute inset-0 flex flex-col items-center justify-center overflow-hidden bg-[#E8E4D8]"><div className="pointer-events-none absolute inset-0 opacity-35 [background-image:linear-gradient(25deg,transparent_48%,#0F7352_49%,#0F7352_51%,transparent_52%),linear-gradient(-35deg,transparent_48%,#FFB72B_49%,#FFB72B_51%,transparent_52%)] [background-size:90px_72px]" /><span className="relative flex size-12 items-center justify-center rounded-full bg-[#FFB72B] shadow-lg"><MapPin className="size-6 fill-[#063f2e] text-[#063f2e]" /></span><p className="relative mt-4 text-sm font-black text-[#063f2e]">{shouldLoad ? "Abrindo o mapa leve…" : "O mapa carrega só quando você chega aqui"}</p><p className="relative mt-1 text-xs text-[#60776e]">Isso deixa a busca inicial mais rápida.</p>{!shouldLoad && <Button type="button" onClick={() => setShouldLoad(true)} className="relative mt-4 h-9 rounded-full bg-[#063f2e] px-4 text-xs font-extrabold">Abrir mapa agora</Button>}</div>}
+        {!mapReady && <div className="absolute inset-0 flex flex-col items-center justify-center overflow-hidden bg-[#E8E4D8] px-4 text-center"><div className="pointer-events-none absolute inset-0 opacity-35 [background-image:linear-gradient(25deg,transparent_48%,#0F7352_49%,#0F7352_51%,transparent_52%),linear-gradient(-35deg,transparent_48%,#FFB72B_49%,#FFB72B_51%,transparent_52%)] [background-size:90px_72px]" /><span className={cn("relative flex items-center justify-center rounded-full bg-[#FFB72B] shadow-lg", expanded ? "size-12" : "size-9")}><MapPin className={cn("fill-[#063f2e] text-[#063f2e]", expanded ? "size-6" : "size-4.5")} /></span><p className={cn("relative text-sm font-black text-[#063f2e]", expanded ? "mt-4" : "mt-2")}>{shouldLoad ? "Abrindo o mapa leve…" : isCompactViewport ? "Abra o mapa quando precisar" : "O mapa carrega só quando você chega aqui"}</p>{expanded && <p className="relative mt-1 text-xs text-[#60776e]">Isso deixa a busca inicial mais rápida.</p>}{!shouldLoad && <Button type="button" onClick={() => { setExpanded(true); setShouldLoad(true) }} className="relative mt-3 h-8 rounded-full bg-[#063f2e] px-4 text-xs font-extrabold">Abrir mapa</Button>}</div>}
       </div>
     </div>
   )
-}
+})
 
 function Legend({ color, label }: { color: string; label: string }) {
   return <span className="flex items-center gap-1"><span className="size-2 rounded-full" style={{ backgroundColor: color }} />{label}</span>
