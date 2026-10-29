@@ -25,7 +25,7 @@ export const properties: Property[] = [
   {
     id: "ALG-1042", title: "Apê 1 Quarto", neighborhood: "Parque 10 de Novembro",
     rent: 1800, condo: 300, iptu: 80, bedrooms: 1, bathrooms: 1, area: 46, petFriendly: true,
-    source: "OLX", sourceLabel: "Agregado via OLX Manaus", advertiser: "broker", latitude: -3.0839, longitude: -59.9923, zones: ["region-centro-sul"],
+    source: "OLX", sourceLabel: "Agregado via OLX Manaus", advertiser: "broker", latitude: -3.0839, longitude: -59.9923, zones: ["region-centro-sul", "uea"],
     images: [image("photo-1600566753190-17f0baa2a6c3"), image("photo-1600607687920-4e2a09cf159d"), image("photo-1600210492486-724fe5c67fb0")],
   },
   {
@@ -37,13 +37,13 @@ export const properties: Property[] = [
   {
     id: "ALG-3184", title: "Apê 2 Quartos", neighborhood: "Flores",
     rent: 2200, condo: 450, iptu: 100, bedrooms: 2, bathrooms: 2, area: 68, petFriendly: true,
-    source: "Loft", sourceLabel: "Agregado via Loft", advertiser: "broker", latitude: -3.0525, longitude: -60.013, zones: ["region-norte"],
+    source: "Loft", sourceLabel: "Agregado via Loft", advertiser: "broker", latitude: -3.0525, longitude: -60.013, zones: ["region-norte", "uea"],
     images: [image("photo-1600607687939-ce8a6c25118c"), image("photo-1600585152915-d208bec867a1"), image("photo-1600566753190-17f0baa2a6c3")],
   },
   {
     id: "ALG-4231", title: "Apê Compacto", neighborhood: "Japiim",
     rent: 1200, condo: 150, iptu: 50, bedrooms: 1, bathrooms: 1, area: 38, petFriendly: true,
-    source: "Alugaí", sourceLabel: "Direto com o proprietário", advertiser: "owner", latitude: -3.1285, longitude: -59.993, zones: ["region-sul", "ufam"],
+    source: "Alugaí", sourceLabel: "Direto com o proprietário", advertiser: "owner", latitude: -3.1285, longitude: -59.993, zones: ["region-sul", "ufam", "pim"],
     images: [image("photo-1600566753086-00f18fb6b3ea"), image("photo-1600210492486-724fe5c67fb0"), image("photo-1600573472550-8090b5e0745e")],
   },
   {
@@ -79,5 +79,7 @@ export const quickFilters = [
   { id: "region-centro-sul", label: "Centro-Sul", emoji: "📍" },
   { id: "region-oeste", label: "Zona Oeste", emoji: "🌊" },
   { id: "ufam", label: "Perto da UFAM", emoji: "🎓" },
+  { id: "uea", label: "Perto da UEA", emoji: "🏛️" },
+  { id: "pim", label: "Polo Industrial / PIM", emoji: "🏭" },
   { id: "owner", label: "Direto com proprietário", emoji: "🔑" },
 ]
