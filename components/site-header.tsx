@@ -14,7 +14,7 @@ export function SiteHeader() {
         <nav className="hidden items-center gap-7 text-[13px] font-bold text-[#315a4c] md:flex" aria-label="Navegação principal">
           <a className="border-b-2 border-transparent py-2 transition-colors hover:border-[#FFB72B] hover:text-[#063f2e]" href="#imoveis">Imóveis</a>
           <a className="border-b-2 border-transparent py-2 transition-colors hover:border-[#FFB72B] hover:text-[#063f2e]" href="#como-funciona">Como funciona</a>
-          <a className="border-b-2 border-transparent py-2 transition-colors hover:border-[#FFB72B] hover:text-[#063f2e]" href="#verificacao">Nossa checagem</a>
+          <a className="border-b-2 border-transparent py-2 transition-colors hover:border-[#FFB72B] hover:text-[#063f2e]" href="#para-quem-anuncia">Para quem anuncia</a>
         </nav>
         <Dialog>
           <DialogTrigger asChild>
@@ -32,8 +32,8 @@ export function SiteHeader() {
               <Input aria-label="Seu nome" placeholder="Como podemos te chamar?" className="h-12 rounded-2xl border-[#063f2e]/15 bg-white" />
               <Input aria-label="WhatsApp" placeholder="WhatsApp com DDD" className="h-12 rounded-2xl border-[#063f2e]/15 bg-white" />
               <Input aria-label="Bairro do imóvel" placeholder="Em qual bairro fica?" className="h-12 rounded-2xl border-[#063f2e]/15 bg-white" />
-              <Button className="mt-1 h-12 rounded-full bg-[#063f2e] font-extrabold text-white hover:bg-[#0B513B]">Enviar para checagem</Button>
-              <p className="text-center text-xs text-[#60776e]">Sem custo e sem compromisso.</p>
+              <Button className="mt-1 h-12 rounded-full bg-[#063f2e] font-extrabold text-white hover:bg-[#0B513B]">Publicar anúncio</Button>
+              <p className="text-center text-xs text-[#60776e]">No MVP, nosso time entra em contato para completar fotos e informações.</p>
             </form>
           </DialogContent>
         </Dialog>

@@ -123,7 +123,7 @@ export function PropertyMap({ properties }: { properties: Property[] }) {
         {activeProperty && mapReady && (
           <div className="absolute inset-x-3 bottom-3 z-[500] rounded-[22px] border border-white/70 bg-[#FFFDF7]/95 p-4 shadow-xl backdrop-blur-md">
             <div className="flex items-start justify-between gap-3">
-              <div><p className="text-[10px] font-black uppercase tracking-[.12em] text-[#C57C00]">{activeProperty.neighborhood}</p><p className="mt-1 font-black text-[#063f2e]">{activeProperty.title}</p><p className="mt-1 text-xs text-[#60776e]">{activeProperty.advertiser === "owner" ? "Direto com o proprietário" : activeProperty.advertiser === "broker" ? "Corretor com CRECI verificado" : activeProperty.sourceLabel}</p></div>
+              <div><p className="text-[10px] font-black uppercase tracking-[.12em] text-[#C57C00]">{activeProperty.neighborhood}</p><p className="mt-1 font-black text-[#063f2e]">{activeProperty.title}</p><p className="mt-1 text-xs text-[#60776e]">{activeProperty.advertiser === "owner" ? "Direto com o proprietário" : activeProperty.advertiser === "broker" ? "Anunciado por corretor" : activeProperty.sourceLabel}</p></div>
               <div className="text-right"><p className="text-lg font-black text-[#063f2e]">{money.format(activeProperty.rent)}</p><p className="text-[10px] text-[#60776e]">aluguel / mês</p></div>
             </div>
             <Button asChild className="mt-3 h-9 w-full rounded-full bg-[#063f2e] text-xs font-extrabold hover:bg-[#0B513B]"><a href={`#${activeProperty.id}`}>Ver detalhes deste imóvel</a></Button>

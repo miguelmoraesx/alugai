@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { ArrowUpRight, Check, MapPin, Search, ShieldCheck, SlidersHorizontal } from "lucide-react"
+import { ArrowUpRight, Check, MapPin, Megaphone, Search, SlidersHorizontal } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { BrandLogo } from "@/components/brand-logo"
 import { PropertyCard } from "@/components/property-card"
@@ -80,7 +80,7 @@ export default function Home() {
               <div>
                 <p className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#C57C00]"><SlidersHorizontal className="size-4" /> Achados de agora</p>
                 <h2 className="text-3xl font-black tracking-[-0.045em] text-[#063f2e] sm:text-4xl">{filteredProperties.length === 1 ? "1 cantinho encontrado" : `${filteredProperties.length} cantinhos encontrados`}</h2>
-                <p className="mt-2 text-sm text-[#60776e]">Veja no mapa quem anuncia direto e quem é corretor verificado.</p>
+                <p className="mt-2 text-sm text-[#60776e]">Veja no mapa quem anuncia direto, por corretor ou em outra plataforma.</p>
                 {(query || activeFilter) && <button type="button" onClick={resetFilters} className="mt-2 text-xs font-bold text-[#0F7352] underline decoration-[#FFB72B] decoration-2 underline-offset-4">Limpar busca e ver tudo</button>}
               </div>
               <Toggle pressed={showTotal} onPressedChange={setShowTotal} variant="outline" className="h-auto min-h-12 justify-start rounded-full border-2 border-[#063f2e]/15 bg-[#FBF7EB] px-4 py-2.5 text-left text-xs font-bold text-[#315a4c] shadow-none hover:bg-white data-[state=on]:border-[#063f2e] data-[state=on]:bg-[#063f2e] data-[state=on]:text-white sm:text-sm" aria-label="Exibir custo total mensal">
@@ -99,7 +99,7 @@ export default function Home() {
               <div className="grid gap-12 lg:grid-cols-[.75fr_1.25fr] lg:gap-24">
                 <div><p className="text-xs font-black uppercase tracking-[0.16em] text-[#FFB72B]">Do seu jeito</p><h2 className="mt-4 text-4xl font-black leading-tight tracking-[-0.05em] sm:text-5xl">A busca fica mais leve quando a informação é clara.</h2><p className="mt-5 max-w-md leading-relaxed text-[#B9CEC6]">Sem dez abas abertas, anúncio repetido ou taxa escondida no fim.</p></div>
                 <div className="divide-y divide-white/15 border-y border-white/15">
-                  {["Diga o bairro ou a região que faz sentido pra sua rotina.", "Compare o aluguel sozinho ou o custo completo do mês.", "Gostou? O WhatsApp já abre com o imóvel identificado."].map((text, index) => (
+                  {["Diga o bairro ou a região que faz sentido pra sua rotina.", "Abra os detalhes, veja as fotos e compare o custo completo.", "Gostou? O WhatsApp já abre com o imóvel identificado."].map((text, index) => (
                     <div key={text} className="grid grid-cols-[54px_1fr_auto] items-center gap-3 py-6 sm:py-7"><span className="text-sm font-black text-[#FFB72B]">0{index + 1}</span><p className="text-lg font-bold leading-snug sm:text-xl">{text}</p><ArrowUpRight className="size-5 text-[#FFB72B]" /></div>
                   ))}
                 </div>
@@ -107,14 +107,14 @@ export default function Home() {
             </div>
           </section>
 
-          <section id="verificacao" className="bg-[#FBF7EB] py-16 sm:py-20">
+          <section id="para-quem-anuncia" className="bg-[#FBF7EB] py-16 sm:py-20">
             <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-20 lg:px-8">
               <div className="relative rounded-[36px] bg-[#FFB72B] p-8 text-[#063f2e] sm:p-10">
-                <ShieldCheck className="size-14" strokeWidth={1.8} /><p className="mt-8 text-3xl font-black leading-tight tracking-[-0.045em] sm:text-4xl">O imóvel pode ser informal. A informação, não.</p><div className="absolute -right-3 -top-3 size-10 rounded-full border-[8px] border-[#0F7352]" />
+                <Megaphone className="size-14" strokeWidth={1.8} /><p className="mt-8 text-3xl font-black leading-tight tracking-[-0.045em] sm:text-4xl">Mais imóveis de bairro. Menos barreira para anunciar.</p><div className="absolute -right-3 -top-3 size-10 rounded-full border-[8px] border-[#0F7352]" />
               </div>
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#0F7352]">Nossa checagem</p><h2 className="mt-3 text-3xl font-black tracking-[-0.045em] text-[#063f2e]">Proprietário direto é bem-vindo.</h2><p className="mt-4 leading-relaxed text-[#60776e]">Boa parte da oferta perto da UFAM e em bairros como Coroado circula no boca a boca. O Alugaí traz esses imóveis para o mapa e identifica claramente quem está do outro lado.</p>
-                <div className="mt-7 grid gap-4">{["Proprietário direto ganha identificação própria", "Corretor recebe selo somente com CRECI verificado", "A origem, os custos e o contato ficam transparentes"].map((item) => <div key={item} className="flex items-center gap-3 font-bold text-[#315a4c]"><span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#FFB72B]"><Check className="size-4 stroke-[3]" /></span>{item}</div>)}</div>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#0F7352]">Para quem anuncia</p><h2 className="mt-3 text-3xl font-black tracking-[-0.045em] text-[#063f2e]">Proprietário direto é o centro do MVP.</h2><p className="mt-4 leading-relaxed text-[#60776e]">Boa parte da oferta perto da UFAM e em bairros como Coroado circula no boca a boca. O Alugaí traz esses imóveis para o digital sem exigir imobiliária ou corretor.</p>
+                <div className="mt-7 grid gap-4">{["Proprietário anuncia com nome, bairro e WhatsApp", "Corretor também participa, identificado como corretor", "Anúncios agregados mantêm a plataforma de origem visível"].map((item) => <div key={item} className="flex items-center gap-3 font-bold text-[#315a4c]"><span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#FFB72B]"><Check className="size-4 stroke-[3]" /></span>{item}</div>)}</div>
               </div>
             </div>
           </section>

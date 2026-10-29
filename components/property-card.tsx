@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { BadgeCheck, Bath, BedDouble, Check, ChevronLeft, ChevronRight, Heart, MessageCircle, PawPrint, ShieldCheck, Square, UserRound } from "lucide-react"
+import { Bath, BedDouble, Building2, Check, ChevronLeft, ChevronRight, Heart, Layers3, MessageCircle, PawPrint, Square, UserRound } from "lucide-react"
 import type { Property } from "@/lib/properties"
+import { PropertyDetailsDialog } from "@/components/property-details-dialog"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -19,7 +20,6 @@ export function PropertyCard({ property, showTotal }: { property: Property; show
   const moveImage = (direction: number) => setImageIndex((current) => (current + direction + property.images.length) % property.images.length)
   const isOwner = property.advertiser === "owner"
   const isBroker = property.advertiser === "broker"
-  const contactLabel = isOwner ? "Falar com proprietário" : isBroker ? "Falar com corretor" : "Pedir contato no WhatsApp"
 
   return (
     <Card id={property.id} className="group scroll-mt-28 gap-0 overflow-hidden rounded-[26px] border-[#063f2e]/12 bg-[#FFFDF7] py-0 shadow-[0_6px_0_rgba(6,63,46,0.04)] transition duration-300 hover:-translate-y-1 hover:border-[#063f2e]/25 hover:shadow-[0_12px_0_rgba(6,63,46,0.07)]">
@@ -30,9 +30,9 @@ export function PropertyCard({ property, showTotal }: { property: Property; show
         {isOwner ? (
           <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-[#FFB72B] px-3 py-1.5 text-[10px] font-extrabold text-[#063f2e] shadow-sm"><UserRound className="size-3.5" /> Direto com proprietário</div>
         ) : isBroker ? (
-          <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-[#0F7352] px-3 py-1.5 text-[10px] font-extrabold text-white shadow-sm"><BadgeCheck className="size-3.5 text-[#FFB72B]" /> Corretor · CRECI verificado</div>
+          <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-[#0F7352] px-3 py-1.5 text-[10px] font-extrabold text-white shadow-sm"><Building2 className="size-3.5 text-[#FFB72B]" /> Anunciado por corretor</div>
         ) : (
-          <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-[#596B64] px-3 py-1.5 text-[10px] font-extrabold text-white shadow-sm"><ShieldCheck className="size-3.5 text-[#FFB72B]" /> Origem checada</div>
+          <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-[#596B64] px-3 py-1.5 text-[10px] font-extrabold text-white shadow-sm"><Layers3 className="size-3.5 text-[#FFB72B]" /> Anúncio agregado</div>
         )}
         <button type="button" onClick={() => setFavorite((value) => !value)} className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full bg-[#FBF7EB] text-[#063f2e] shadow-sm transition hover:scale-105" aria-label={favorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}><Heart className={cn("size-[17px]", favorite && "fill-[#FFB72B] text-[#FFB72B]")} /></button>
         <button type="button" onClick={() => moveImage(-1)} className="absolute left-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-[#FBF7EB]/95 text-[#063f2e] opacity-0 transition group-hover:opacity-100 focus:opacity-100" aria-label="Foto anterior"><ChevronLeft className="size-4" /></button>
@@ -62,7 +62,7 @@ export function PropertyCard({ property, showTotal }: { property: Property; show
         </div>
 
         <div className="my-4 flex items-center justify-between gap-3 text-[10px] text-[#71837c]"><span>Fonte: <strong className="text-[#315a4c]">{property.sourceLabel}</strong></span><span className="shrink-0 font-bold text-[#0F7352]">Disponível hoje</span></div>
-        <Button asChild className="h-11 w-full rounded-full bg-[#063f2e] font-extrabold text-white shadow-none transition hover:bg-[#0B513B]"><a href={whatsappUrl} target="_blank" rel="noreferrer"><MessageCircle className="size-4.5 text-[#FFB72B]" /> {contactLabel}</a></Button>
+        <div className="grid grid-cols-[1.15fr_.85fr] gap-2"><PropertyDetailsDialog property={property} /><Button asChild className="h-11 rounded-full bg-[#063f2e] font-extrabold text-white shadow-none transition hover:bg-[#0B513B]"><a href={whatsappUrl} target="_blank" rel="noreferrer"><MessageCircle className="size-4.5 text-[#FFB72B]" /> WhatsApp</a></Button></div>
       </CardContent>
     </Card>
   )

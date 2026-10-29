@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Alugaí | Aluguel residencial em Manaus",
-  description: "Encontre imóveis verificados para alugar em Manaus e compare o custo total mensal.",
+  description: "Encontre imóveis para alugar em Manaus, compare o custo mensal e fale direto com quem anuncia.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
