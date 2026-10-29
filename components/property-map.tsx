@@ -67,6 +67,8 @@ export const PropertyMap = memo(function PropertyMap({ properties }: { propertie
         zoom: 11,
         minZoom: 9,
         maxZoom: 17,
+        maxBounds: [[-3.35, -60.35], [-2.75, -59.65]],
+        maxBoundsViscosity: 0.8,
         preferCanvas: true,
         zoomAnimation: false,
         fadeAnimation: false,
@@ -76,10 +78,12 @@ export const PropertyMap = memo(function PropertyMap({ properties }: { propertie
       L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: "© OpenStreetMap",
         maxZoom: 17,
+        crossOrigin: true,
         detectRetina: false,
         updateWhenZooming: false,
-        updateWhenIdle: true,
-        keepBuffer: 1,
+        updateWhenIdle: false,
+        updateInterval: 100,
+        keepBuffer: 3,
       }).addTo(map)
 
       const ufamLabel = document.createElement("div")
@@ -89,7 +93,7 @@ export const PropertyMap = memo(function PropertyMap({ properties }: { propertie
       L.marker([-3.1021, -59.9797], { icon: ufamIcon, title: "Universidade Federal do Amazonas" }).addTo(map)
 
       mapRef.current = map
-      requestAnimationFrame(() => map.invalidateSize())
+      requestAnimationFrame(() => map.invalidateSize({ animate: false, pan: false }))
       setMapReady(true)
     }
 
@@ -103,8 +107,25 @@ export const PropertyMap = memo(function PropertyMap({ properties }: { propertie
 
   useEffect(() => {
     if (!mapReady || !expanded) return
-    requestAnimationFrame(() => mapRef.current?.invalidateSize())
+    requestAnimationFrame(() => mapRef.current?.invalidateSize({ animate: false, pan: false }))
   }, [expanded, mapReady])
+
+  useEffect(() => {
+    const container = containerRef.current
+    if (!mapReady || !container || !("ResizeObserver" in window)) return
+    let animationFrame = 0
+    const observer = new ResizeObserver(() => {
+      cancelAnimationFrame(animationFrame)
+      animationFrame = requestAnimationFrame(() => {
+        mapRef.current?.invalidateSize({ animate: false, pan: false, debounceMoveend: true })
+      })
+    })
+    observer.observe(container)
+    return () => {
+      cancelAnimationFrame(animationFrame)
+      observer.disconnect()
+    }
+  }, [mapReady])
 
   useEffect(() => {
     if (!mapReady || !mapRef.current || !libraryRef.current) return
@@ -124,14 +145,14 @@ export const PropertyMap = memo(function PropertyMap({ properties }: { propertie
         keyboard: true,
       }).on("click", () => {
         setSelected(property)
-        mapRef.current?.flyTo([property.latitude, property.longitude], 14, { duration: 0.45 })
+        mapRef.current?.setView([property.latitude, property.longitude], 14, { animate: false })
       }).addTo(mapRef.current!)
       markersRef.current.push(marker)
     })
 
     if (properties.length > 0) {
       const bounds = L.latLngBounds(properties.map((property) => [property.latitude, property.longitude]))
-      mapRef.current.fitBounds(bounds, { padding: [55, 55], maxZoom: 13, animate: true, duration: 0.45 })
+      mapRef.current.fitBounds(bounds, { padding: [55, 55], maxZoom: 13, animate: false })
     }
   }, [mapReady, properties])
 
