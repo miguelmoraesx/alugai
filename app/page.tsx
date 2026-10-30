@@ -135,7 +135,7 @@ export default function Home() {
     setQuery(term)
     setVisibleCount(12)
     if (matches.length === 0) {
-      setSearchError(`Lugar não encontrado: “${term}”. Tente outro bairro ou escolha um dos filtros abaixo.`)
+      setSearchError(`Não encontramos "${term}". Tente outro bairro ou use os filtros.`)
       return
     }
     setSearchError("")
@@ -150,13 +150,13 @@ export default function Home() {
           <section className="overflow-hidden bg-[#FBF7EB]">
             <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.05fr_.95fr] lg:gap-20 lg:px-8 lg:py-20">
               <div>
-                <p className="mb-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-[#0F7352]"><span className="h-2 w-8 rounded-full bg-[#FFB72B]" /> Feito em Manaus, pra Manaus</p>
-                <h1 className="max-w-2xl text-[3.25rem] font-black leading-[.94] tracking-[-0.065em] text-[#063f2e] sm:text-6xl lg:text-[4.9rem]">Um lugar em Manaus pra chamar de <span className="relative whitespace-nowrap">seu.<svg className="absolute -bottom-2 left-0 h-3 w-full text-[#FFB72B]" viewBox="0 0 220 14" preserveAspectRatio="none" aria-hidden="true"><path d="M3 10c46-8 133-8 214-4" fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="round" /></svg></span></h1>
-                <p className="mt-7 max-w-xl text-lg leading-relaxed text-[#48685c]">Aqui cabe o anúncio da imobiliária e o da dona da kitnet no Coroado. A gente organiza, mostra quem anunciou e deixa o custo bem claro.</p>
+                <p className="mb-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-[#0F7352]"><span className="h-2 w-8 rounded-full bg-[#FFB72B]" /> Aluguel em Manaus</p>
+                <h1 className="max-w-2xl text-[3.25rem] font-black leading-[.94] tracking-[-0.065em] text-[#063f2e] sm:text-6xl lg:text-[4.9rem]">Encontre seu próximo <span className="relative whitespace-nowrap">aluguel.<svg className="absolute -bottom-2 left-0 h-3 w-full text-[#FFB72B]" viewBox="0 0 220 14" preserveAspectRatio="none" aria-hidden="true"><path d="M3 10c46-8 133-8 214-4" fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="round" /></svg></span></h1>
+                <p className="mt-7 max-w-xl text-lg leading-relaxed text-[#48685c]">Tem kitnet no Coroado, apartamento no Parque 10 e casa na Ponta Negra. Cada anúncio mostra quem publicou e quanto custa com as taxas.</p>
 
                 <form onSubmit={handleSearch} className="mt-8 flex max-w-xl items-center gap-2 rounded-[20px] border-2 border-[#063f2e] bg-white p-1.5 shadow-[5px_5px_0_#FFB72B]">
                   <MapPin className="ml-3 size-5 shrink-0 fill-[#FFB72B] text-[#063f2e]" />
-                  <Input value={searchInput} onChange={(event) => { setSearchInput(event.target.value); if (searchError) setSearchError("") }} list="bairros-manaus" placeholder="Qual bairro ou região?" aria-label="Buscar por bairro ou região" aria-describedby="search-feedback" className="h-12 border-0 bg-transparent px-2 text-base text-[#063f2e] shadow-none placeholder:text-[#789087] focus-visible:ring-0" />
+                  <Input value={searchInput} onChange={(event) => { setSearchInput(event.target.value); if (searchError) setSearchError("") }} list="bairros-manaus" placeholder="Digite um bairro ou uma região" aria-label="Buscar por bairro ou região" aria-describedby="search-feedback" className="h-12 border-0 bg-transparent px-2 text-base text-[#063f2e] shadow-none placeholder:text-[#789087] focus-visible:ring-0" />
                   <datalist id="bairros-manaus">{properties.map((property) => <option key={property.id} value={property.neighborhood} />)}</datalist>
                   <Button type="submit" className="size-11 shrink-0 rounded-2xl bg-[#063f2e] p-0 text-white hover:bg-[#0B513B] sm:h-12 sm:w-auto sm:px-5" aria-label="Buscar imóveis"><Search className="size-5" /><span className="hidden font-extrabold sm:inline">Buscar</span></Button>
                 </form>
@@ -200,7 +200,7 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="absolute -bottom-5 -left-4 rotate-[-3deg] rounded-[18px] bg-[#FFB72B] px-5 py-4 text-[#063f2e] shadow-lg sm:-left-10">
-                  <p className="text-[10px] font-black uppercase tracking-[0.12em]">Custo sem surpresa</p><p className="mt-0.5 text-xl font-black">R$ 5.550 <span className="text-xs">/ mês</span></p>
+                  <p className="text-[10px] font-black uppercase tracking-[0.12em]">Aluguel + taxas</p><p className="mt-0.5 text-xl font-black">R$ 5.550 <span className="text-xs">/ mês</span></p>
                 </div>
               </div>
             </div>
@@ -209,9 +209,9 @@ export default function Home() {
           <section id="imoveis" className="mx-auto max-w-7xl scroll-mt-24 px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
             <div className="mb-8 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
               <div>
-                <p className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#C57C00]"><SlidersHorizontal className="size-4" /> Achados de agora</p>
-                <h2 className="text-3xl font-black tracking-[-0.045em] text-[#063f2e] sm:text-4xl">{filteredProperties.length === 1 ? "1 cantinho encontrado" : `${filteredProperties.length} cantinhos encontrados`}</h2>
-                <p className="mt-2 text-sm text-[#60776e]">Veja no mapa quem anuncia direto, por corretor ou em outra plataforma.</p>
+                <p className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#C57C00]"><SlidersHorizontal className="size-4" /> Imóveis disponíveis</p>
+                <h2 className="text-3xl font-black tracking-[-0.045em] text-[#063f2e] sm:text-4xl">{filteredProperties.length === 1 ? "1 imóvel encontrado" : `${filteredProperties.length} imóveis encontrados`}</h2>
+                <p className="mt-2 text-sm text-[#60776e]">No mapa, as cores mostram quem publicou cada anúncio.</p>
                 {(query || activeFilter || hasBasicFilters) && <button type="button" onClick={resetFilters} className="mt-2 text-xs font-bold text-[#0F7352] underline decoration-[#FFB72B] decoration-2 underline-offset-4">Limpar busca e ver tudo</button>}
               </div>
               <Toggle pressed={showTotal} onPressedChange={setShowTotal} variant="outline" className="h-auto min-h-12 justify-start rounded-full border-2 border-[#063f2e]/15 bg-[#FBF7EB] px-4 py-2.5 text-left text-xs font-bold text-[#315a4c] shadow-none hover:bg-white data-[state=on]:border-[#063f2e] data-[state=on]:bg-[#063f2e] data-[state=on]:text-white sm:text-sm" aria-label="Exibir custo total mensal">
@@ -221,7 +221,7 @@ export default function Home() {
             </div>
 
             <div className="mb-8 flex flex-col gap-3 rounded-[24px] border border-[#063f2e]/12 bg-[#FBF7EB] p-3.5 sm:flex-row sm:items-center">
-              <div className="flex items-center gap-2 px-1 text-xs font-black uppercase tracking-[0.1em] text-[#60776e]"><SlidersHorizontal className="size-4 text-[#C57C00]" /> Refine os anúncios</div>
+              <div className="flex items-center gap-2 px-1 text-xs font-black uppercase tracking-[0.1em] text-[#60776e]"><SlidersHorizontal className="size-4 text-[#C57C00]" /> Filtros dos anúncios</div>
               <div className="grid flex-1 gap-2 sm:grid-cols-3 lg:ml-auto lg:max-w-2xl">
                 <Select value={bedroomFilter} onValueChange={(value) => { setBedroomFilter(value); setVisibleCount(12) }}>
                   <SelectTrigger className="h-10 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Filtrar por número de quartos"><BedDouble className="size-4 text-[#0F7352]" /><SelectValue /></SelectTrigger>
@@ -253,9 +253,9 @@ export default function Home() {
           <section id="como-funciona" className="bg-[#063f2e] py-16 text-[#FBF7EB] sm:py-20">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="grid gap-12 lg:grid-cols-[.75fr_1.25fr] lg:gap-24">
-                <div><p className="text-xs font-black uppercase tracking-[0.16em] text-[#FFB72B]">Do seu jeito</p><h2 className="mt-4 text-4xl font-black leading-tight tracking-[-0.05em] sm:text-5xl">A busca fica mais leve quando a informação é clara.</h2><p className="mt-5 max-w-md leading-relaxed text-[#B9CEC6]">Sem dez abas abertas, anúncio repetido ou taxa escondida no fim.</p></div>
+                <div><p className="text-xs font-black uppercase tracking-[0.16em] text-[#FFB72B]">Como funciona</p><h2 className="mt-4 text-4xl font-black leading-tight tracking-[-0.05em] sm:text-5xl">Veja preço, taxas e origem no mesmo lugar.</h2><p className="mt-5 max-w-md leading-relaxed text-[#B9CEC6]">Cada anúncio separa aluguel, condomínio e IPTU. Você também vê se quem publicou foi proprietário, corretor ou outra plataforma.</p></div>
                 <div className="divide-y divide-white/15 border-y border-white/15">
-                  {["Diga o bairro ou a região que faz sentido pra sua rotina.", "Abra os detalhes, veja as fotos e compare o custo completo.", "Gostou? O WhatsApp já abre com o imóvel identificado."].map((text, index) => (
+                  {["Busque pelo bairro, pela zona ou por um ponto de referência.", "Confira fotos, vagas, taxas e quem publicou o anúncio.", "Abra o WhatsApp com o código do imóvel já preenchido."].map((text, index) => (
                     <div key={text} className="grid grid-cols-[54px_1fr_auto] items-center gap-3 py-6 sm:py-7"><span className="text-sm font-black text-[#FFB72B]">0{index + 1}</span><p className="text-lg font-bold leading-snug sm:text-xl">{text}</p><ArrowUpRight className="size-5 text-[#FFB72B]" /></div>
                   ))}
                 </div>
@@ -266,18 +266,18 @@ export default function Home() {
           <section id="para-quem-anuncia" className="bg-[#FBF7EB] py-16 sm:py-20">
             <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:items-center lg:gap-20 lg:px-8">
               <div className="relative rounded-[36px] bg-[#FFB72B] p-8 text-[#063f2e] sm:p-10">
-                <Megaphone className="size-14" strokeWidth={1.8} /><p className="mt-8 text-3xl font-black leading-tight tracking-[-0.045em] sm:text-4xl">Mais imóveis de bairro. Menos barreira para anunciar.</p><div className="absolute -right-3 -top-3 size-10 rounded-full border-[8px] border-[#0F7352]" />
+                <Megaphone className="size-14" strokeWidth={1.8} /><p className="mt-8 text-3xl font-black leading-tight tracking-[-0.045em] sm:text-4xl">O imóvel que circula no boca a boca também pode aparecer aqui.</p><div className="absolute -right-3 -top-3 size-10 rounded-full border-[8px] border-[#0F7352]" />
               </div>
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#0F7352]">Para quem anuncia</p><h2 className="mt-3 text-3xl font-black tracking-[-0.045em] text-[#063f2e]">Proprietário direto é o centro do MVP.</h2><p className="mt-4 leading-relaxed text-[#60776e]">Boa parte da oferta perto da UFAM e em bairros como Coroado circula no boca a boca. O Alugaí traz esses imóveis para o digital sem exigir imobiliária ou corretor.</p>
-                <div className="mt-7 grid gap-4">{["Proprietário anuncia com nome, bairro e WhatsApp", "Corretor também participa, identificado como corretor", "Anúncios agregados mantêm a plataforma de origem visível"].map((item) => <div key={item} className="flex items-center gap-3 font-bold text-[#315a4c]"><span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#FFB72B]"><Check className="size-4 stroke-[3]" /></span>{item}</div>)}</div>
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#0F7352]">Para quem anuncia</p><h2 className="mt-3 text-3xl font-black tracking-[-0.045em] text-[#063f2e]">Proprietário também pode anunciar.</h2><p className="mt-4 leading-relaxed text-[#60776e]">Perto da UFAM e em bairros como Coroado, muita oferta circula por indicação. O Alugaí coloca esses imóveis na busca sem exigir imobiliária ou corretor.</p>
+                <div className="mt-7 grid gap-4">{["Proprietário informa bairro e WhatsApp", "Corretor aparece identificado no anúncio", "Anúncio agregado mantém a fonte original"].map((item) => <div key={item} className="flex items-center gap-3 font-bold text-[#315a4c]"><span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-[#FFB72B]"><Check className="size-4 stroke-[3]" /></span>{item}</div>)}</div>
               </div>
             </div>
           </section>
         </main>
 
         <footer className="border-t border-[#063f2e]/10 bg-[#FBF7EB]">
-          <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8"><BrandLogo className="scale-90 origin-left" /><div className="flex items-center gap-2 text-xs font-bold text-[#60776e]"><MapPin className="size-4 fill-[#FFB72B] text-[#063f2e]" /> Manaus, Amazonas <span className="mx-2 text-[#D3CCBA]">•</span> Aluguel sem enrolação</div></div>
+          <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8"><BrandLogo className="scale-90 origin-left" /><div className="flex items-center gap-2 text-xs font-bold text-[#60776e]"><MapPin className="size-4 fill-[#FFB72B] text-[#063f2e]" /> Imóveis para alugar em Manaus</div></div>
         </footer>
       </div>
     </TooltipProvider>

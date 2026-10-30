@@ -30,7 +30,7 @@ export function PropertyDetailsDialog({ property }: { property: Property }) {
           <div className="bg-[#E8E4D8] p-3 sm:p-5">
             <div className="relative overflow-hidden rounded-[22px] bg-[#DAD5C7]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={property.images[photo]} alt={`${property.title} em ${property.neighborhood} — foto ampliada ${photo + 1}`} decoding="async" className="aspect-[4/3] size-full object-cover" />
+              <img src={property.images[photo]} alt={`${property.title} em ${property.neighborhood}, foto ampliada ${photo + 1}`} decoding="async" className="aspect-[4/3] size-full object-cover" />
               <button type="button" onClick={() => movePhoto(-1)} className="absolute left-3 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-[#FBF7EB]/95 text-[#063f2e] shadow-md" aria-label="Foto anterior"><ChevronLeft className="size-5" /></button>
               <button type="button" onClick={() => movePhoto(1)} className="absolute right-3 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-[#FBF7EB]/95 text-[#063f2e] shadow-md" aria-label="Próxima foto"><ChevronRight className="size-5" /></button>
               <span className="absolute bottom-3 right-3 rounded-full bg-[#063f2e]/80 px-3 py-1 text-xs font-bold text-white">{photo + 1} / {property.images.length}</span>
@@ -70,7 +70,7 @@ export function PropertyDetailsDialog({ property }: { property: Property }) {
               </div>
             </div>
 
-            <div className="mt-5 rounded-2xl border border-[#063f2e]/10 px-4 py-3 text-xs leading-relaxed text-[#60776e]"><strong className="text-[#315a4c]">Origem do anúncio:</strong> {property.sourceLabel}. As informações são fornecidas pelo anunciante ou pela plataforma de origem.</div>
+            <div className="mt-5 rounded-2xl border border-[#063f2e]/10 px-4 py-3 text-xs leading-relaxed text-[#60776e]">Fonte: <span className="font-bold text-[#315a4c]">{property.sourceLabel}</span>. Os dados vêm do anunciante ou da plataforma de origem.</div>
             <Button asChild className="mt-5 h-12 w-full rounded-full bg-[#063f2e] font-extrabold text-white hover:bg-[#0B513B]"><a href={whatsappUrl} target="_blank" rel="noreferrer"><MessageCircle className="size-5 text-[#FFB72B]" /> {contactLabel}</a></Button>
             <p className="mt-3 text-center text-[10px] text-[#789087]">Código do imóvel: {property.id}</p>
           </div>

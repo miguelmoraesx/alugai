@@ -25,7 +25,7 @@ export const PropertyCard = memo(function PropertyCard({ property, showTotal }: 
     <Card id={property.id} className="group scroll-mt-28 gap-0 overflow-hidden rounded-[26px] border-[#063f2e]/12 bg-[#FFFDF7] py-0 shadow-[0_6px_0_rgba(6,63,46,0.04)] transition duration-300 [contain-intrinsic-size:620px] [content-visibility:auto] hover:-translate-y-1 hover:border-[#063f2e]/25 hover:shadow-[0_12px_0_rgba(6,63,46,0.07)]">
       <div className="relative aspect-[4/3] overflow-hidden bg-[#E8E4D8]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={property.images[imageIndex]} alt={`${property.title} em ${property.neighborhood} — foto ${imageIndex + 1}`} loading="lazy" decoding="async" className="size-full object-cover transition-transform duration-700 group-hover:scale-[1.025]" />
+        <img src={property.images[imageIndex]} alt={`${property.title} em ${property.neighborhood}, foto ${imageIndex + 1}`} loading="lazy" decoding="async" className="size-full object-cover transition-transform duration-700 group-hover:scale-[1.025]" />
         <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#032b20]/45 to-transparent" />
         {isOwner ? (
           <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-[#FFB72B] px-3 py-1.5 text-[10px] font-extrabold text-[#063f2e] shadow-sm"><UserRound className="size-3.5" /> Direto com proprietário</div>
