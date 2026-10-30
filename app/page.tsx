@@ -36,11 +36,11 @@ export default function Home() {
   const [showTotal, setShowTotal] = useState(false)
   const [searchError, setSearchError] = useState("")
   const [visibleCount, setVisibleCount] = useState(12)
-  const [selectedRegion, setSelectedRegion] = useState("")
+  const [selectedRegion, setSelectedRegion] = useState("all")
   const [selectedNeighborhood, setSelectedNeighborhood] = useState("all")
   const [bedroomFilter, setBedroomFilter] = useState("any")
   const [parkingFilter, setParkingFilter] = useState("any")
-  const [petOnly, setPetOnly] = useState(false)
+  const [petFilter, setPetFilter] = useState("any")
 
   const filteredProperties = useMemo(() => {
     const search = normalize(query.trim())
@@ -49,14 +49,14 @@ export default function Home() {
       const matchesZone = !activeFilter || (activeFilter === "owner" ? property.advertiser === "owner" : property.zones.includes(activeFilter))
       const matchesBedrooms = bedroomFilter === "any" || (bedroomFilter === "3+" ? property.bedrooms >= 3 : property.bedrooms === Number(bedroomFilter))
       const matchesParking = parkingFilter === "any" || (parkingFilter === "2+" ? property.parkingSpaces >= 2 : property.parkingSpaces >= Number(parkingFilter))
-      const matchesPet = !petOnly || property.petFriendly
+      const matchesPet = petFilter === "any" || (petFilter === "yes" ? property.petFriendly : !property.petFriendly)
       return matchesSearch && matchesZone && matchesBedrooms && matchesParking && matchesPet
     })
-  }, [query, activeFilter, bedroomFilter, parkingFilter, petOnly])
+  }, [query, activeFilter, bedroomFilter, parkingFilter, petFilter])
 
   const visibleProperties = filteredProperties.slice(0, visibleCount)
   const availableNeighborhoods = locationGroups.find((region) => region.id === selectedRegion)?.neighborhoods ?? []
-  const hasBasicFilters = bedroomFilter !== "any" || parkingFilter !== "any" || petOnly
+  const hasBasicFilters = bedroomFilter !== "any" || parkingFilter !== "any" || petFilter !== "any"
   const scrollToResults = () => window.setTimeout(() => document.getElementById("imoveis")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80)
 
   const resetFilters = () => {
@@ -65,17 +65,17 @@ export default function Home() {
     setActiveFilter(null)
     setSearchError("")
     setVisibleCount(12)
-    setSelectedRegion("")
+    setSelectedRegion("all")
     setSelectedNeighborhood("all")
     setBedroomFilter("any")
     setParkingFilter("any")
-    setPetOnly(false)
+    setPetFilter("any")
   }
 
   const clearBasicFilters = () => {
     setBedroomFilter("any")
     setParkingFilter("any")
-    setPetOnly(false)
+    setPetFilter("any")
     setVisibleCount(12)
   }
 
@@ -86,21 +86,16 @@ export default function Home() {
     setSearchInput("")
     setSearchError("")
     setVisibleCount(12)
-    setSelectedRegion(nextFilter?.startsWith("region-") ? nextFilter : "")
+    setSelectedRegion(nextFilter?.startsWith("region-") ? nextFilter : "all")
     setSelectedNeighborhood("all")
     const matchCount = nextFilter ? properties.filter((property) => matchesQuickFilter(property, nextFilter)).length : properties.length
     if (matchCount > 0) scrollToResults()
   }
 
   const handleLocationSearch = () => {
-    if (!selectedRegion) {
-      setSearchError("Escolha primeiro uma zona de Manaus para ver os bairros disponíveis.")
-      return
-    }
-
-    const region = locationGroups.find((item) => item.id === selectedRegion)
+    const region = selectedRegion === "all" ? undefined : locationGroups.find((item) => item.id === selectedRegion)
     const neighborhood = selectedNeighborhood === "all" ? "" : selectedNeighborhood
-    setActiveFilter(neighborhood ? null : selectedRegion)
+    setActiveFilter(neighborhood ? null : region?.id ?? null)
     setQuery(neighborhood)
     setSearchInput(neighborhood || region?.label || "")
     setSearchError("")
@@ -111,7 +106,7 @@ export default function Home() {
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const term = searchInput.trim()
-    setSelectedRegion("")
+    setSelectedRegion("all")
     setSelectedNeighborhood("all")
     if (!term) {
       resetFilters()
@@ -166,13 +161,14 @@ export default function Home() {
                   <p className="mb-2.5 text-[11px] font-extrabold uppercase tracking-[0.1em] text-[#60776e]">Ou escolha pela lista</p>
                   <div className="grid gap-2 sm:grid-cols-[1fr_1.25fr_auto]">
                     <Select value={selectedRegion} onValueChange={(value) => { setSelectedRegion(value); setSelectedNeighborhood("all"); setSearchError("") }}>
-                      <SelectTrigger className="h-11 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Escolher zona de Manaus"><SelectValue placeholder="Escolha a zona" /></SelectTrigger>
+                      <SelectTrigger className="h-11 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Escolher zona de Manaus"><SelectValue>{selectedRegion === "all" ? "Todas as zonas" : locationGroups.find((region) => region.id === selectedRegion)?.label}</SelectValue></SelectTrigger>
                       <SelectContent className="border-[#063f2e]/10 bg-[#FFFDF7]">
+                        <SelectItem value="all">Todas as zonas</SelectItem>
                         {locationGroups.map((region) => <SelectItem key={region.id} value={region.id}>{region.emoji} {region.label}</SelectItem>)}
                       </SelectContent>
                     </Select>
-                    <Select value={selectedNeighborhood} onValueChange={(value) => { setSelectedNeighborhood(value); setSearchError("") }} disabled={!selectedRegion}>
-                      <SelectTrigger className="h-11 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Escolher bairro"><SelectValue placeholder="Depois, escolha o bairro" /></SelectTrigger>
+                    <Select value={selectedNeighborhood} onValueChange={(value) => { setSelectedNeighborhood(value); setSearchError("") }}>
+                      <SelectTrigger className="h-11 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Escolher bairro"><SelectValue>{selectedRegion === "all" ? "Todos os bairros" : selectedNeighborhood === "all" ? "Todos os bairros da zona" : selectedNeighborhood}</SelectValue></SelectTrigger>
                       <SelectContent className="border-[#063f2e]/10 bg-[#FFFDF7]">
                         <SelectItem value="all">Todos os bairros da zona</SelectItem>
                         {availableNeighborhoods.map((neighborhood) => <SelectItem key={neighborhood} value={neighborhood}>{neighborhood}</SelectItem>)}
@@ -194,7 +190,7 @@ export default function Home() {
                 <div className="absolute -bottom-7 -right-8 size-32 rounded-full border-[18px] border-[#0F7352]/12" />
                 <div className="relative overflow-hidden rounded-[48px_48px_48px_12px] border-[6px] border-white bg-white shadow-[0_20px_50px_rgba(6,63,46,.16)]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={properties[4].images[0]} alt="Casa para alugar na Ponta Negra, em Manaus" className="aspect-[4/4.35] w-full object-cover" />
+                  <img src={properties[4].images[0]} alt="Casa para alugar na Ponta Negra, em Manaus" className="aspect-[3/2] w-full object-cover" />
                   <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#032b20] via-[#032b20]/75 to-transparent px-6 pb-6 pt-24 text-white sm:px-8 sm:pb-8">
                     <p className="text-xs font-bold text-[#FFCA57]">Ponta Negra · Manaus</p><p className="mt-1 text-2xl font-black tracking-[-0.04em]">Casa em condomínio</p><p className="mt-2 text-sm text-white/75">4 quartos · 210 m² · aceita pet</p>
                   </div>
@@ -224,7 +220,7 @@ export default function Home() {
               <div className="flex items-center gap-2 px-1 text-xs font-black uppercase tracking-[0.1em] text-[#60776e]"><SlidersHorizontal className="size-4 text-[#C57C00]" /> Filtros dos anúncios</div>
               <div className="grid flex-1 gap-2 sm:grid-cols-3 lg:ml-auto lg:max-w-2xl">
                 <Select value={bedroomFilter} onValueChange={(value) => { setBedroomFilter(value); setVisibleCount(12) }}>
-                  <SelectTrigger className="h-10 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Filtrar por número de quartos"><BedDouble className="size-4 text-[#0F7352]" /><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-10 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Filtrar por número de quartos"><BedDouble className="size-4 text-[#0F7352]" /><SelectValue>{bedroomFilter === "any" ? "Quartos: qualquer" : bedroomFilter === "3+" ? "3 quartos ou mais" : `${bedroomFilter} ${bedroomFilter === "1" ? "quarto" : "quartos"}`}</SelectValue></SelectTrigger>
                   <SelectContent className="border-[#063f2e]/10 bg-[#FFFDF7]">
                     <SelectItem value="any">Quartos: qualquer</SelectItem>
                     <SelectItem value="1">1 quarto</SelectItem>
@@ -233,14 +229,21 @@ export default function Home() {
                   </SelectContent>
                 </Select>
                 <Select value={parkingFilter} onValueChange={(value) => { setParkingFilter(value); setVisibleCount(12) }}>
-                  <SelectTrigger className="h-10 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Filtrar por vagas de garagem"><CarFront className="size-4 text-[#0F7352]" /><SelectValue /></SelectTrigger>
+                  <SelectTrigger className="h-10 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Filtrar por vagas de garagem"><CarFront className="size-4 text-[#0F7352]" /><SelectValue>{parkingFilter === "any" ? "Garagem: qualquer" : parkingFilter === "2+" ? "2 vagas ou mais" : "1 vaga ou mais"}</SelectValue></SelectTrigger>
                   <SelectContent className="border-[#063f2e]/10 bg-[#FFFDF7]">
                     <SelectItem value="any">Garagem: qualquer</SelectItem>
                     <SelectItem value="1">1 vaga ou mais</SelectItem>
                     <SelectItem value="2+">2 vagas ou mais</SelectItem>
                   </SelectContent>
                 </Select>
-                <Toggle pressed={petOnly} onPressedChange={(pressed) => { setPetOnly(pressed); setVisibleCount(12) }} variant="outline" className="h-10 justify-start rounded-xl border-[#063f2e]/15 bg-white px-3 font-bold text-[#315a4c] shadow-none hover:bg-[#FFF8E8] data-[state=on]:border-[#FFB72B] data-[state=on]:bg-[#FFEDC4] data-[state=on]:text-[#063f2e]" aria-label="Mostrar somente imóveis que aceitam pet"><PawPrint className="size-4 text-[#0F7352]" /> Aceita pet</Toggle>
+                <Select value={petFilter} onValueChange={(value) => { setPetFilter(value); setVisibleCount(12) }}>
+                  <SelectTrigger className="h-10 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Filtrar por aceite de animais"><PawPrint className="size-4 text-[#0F7352]" /><SelectValue>{petFilter === "any" ? "Pet: qualquer" : petFilter === "yes" ? "Aceita pet: sim" : "Aceita pet: não"}</SelectValue></SelectTrigger>
+                  <SelectContent className="border-[#063f2e]/10 bg-[#FFFDF7]">
+                    <SelectItem value="any">Pet: qualquer</SelectItem>
+                    <SelectItem value="yes">Aceita pet: sim</SelectItem>
+                    <SelectItem value="no">Aceita pet: não</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               {hasBasicFilters && <Button type="button" onClick={clearBasicFilters} variant="ghost" className="h-9 justify-start rounded-full px-3 text-xs font-bold text-[#60776e] hover:bg-white hover:text-[#063f2e]"><X className="size-3.5" /> Limpar filtros</Button>}
             </div>

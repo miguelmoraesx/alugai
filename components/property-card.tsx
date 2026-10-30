@@ -51,7 +51,7 @@ export const PropertyCard = memo(function PropertyCard({ property, showTotal }: 
           <Spec icon={Bath} value={`${property.bathrooms} ${property.bathrooms === 1 ? "banheiro" : "banheiros"}`} />
           <Spec icon={CarFront} value={property.parkingSpaces === 0 ? "Sem garagem" : `${property.parkingSpaces} ${property.parkingSpaces === 1 ? "vaga" : "vagas"}`} />
           <Spec icon={Square} value={`${property.area} m²`} />
-          <Spec icon={PawPrint} value={property.petFriendly ? "Aceita pet" : "Pet? consulte"} />
+          <Spec icon={PawPrint} value={property.petFriendly ? "Aceita pet" : "Não aceita pet"} />
         </div>
 
         <div className="mt-auto border-t border-dashed border-[#063f2e]/18 pt-4">

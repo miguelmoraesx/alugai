@@ -57,7 +57,7 @@ export function PropertyDetailsDialog({ property }: { property: Property }) {
               <Detail icon={Bath} label={`${property.bathrooms} ${property.bathrooms === 1 ? "banheiro" : "banheiros"}`} />
               <Detail icon={CarFront} label={property.parkingSpaces === 0 ? "Sem garagem" : `${property.parkingSpaces} ${property.parkingSpaces === 1 ? "vaga" : "vagas"}`} />
               <Detail icon={Square} label={`${property.area} m²`} />
-              <Detail icon={PawPrint} label={property.petFriendly ? "Aceita pet" : "Pet? consulte"} />
+              <Detail icon={PawPrint} label={property.petFriendly ? "Aceita pet" : "Não aceita pet"} />
             </div>
 
             <div className="rounded-[22px] bg-white p-5 shadow-[0_5px_0_rgba(6,63,46,.05)]">
