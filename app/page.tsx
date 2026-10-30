@@ -195,7 +195,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="relative mx-auto w-full max-w-[700px] lg:mx-0 lg:mt-12">
+              <div className="relative mx-auto w-full max-w-[700px] lg:mx-0 lg:mt-12 lg:translate-x-6">
                 <div className="absolute -left-6 -top-5 size-20 rounded-[24px] bg-[#FFB72B] sm:-left-9 sm:size-28" />
                 <div className="absolute -bottom-7 -right-8 size-32 rounded-full border-[18px] border-[#0F7352]/12" />
                 <div className="relative aspect-[4/3] overflow-hidden rounded-[48px_48px_48px_12px] border-[6px] border-white bg-[#032b20] shadow-[0_20px_50px_rgba(6,63,46,.16)]">
