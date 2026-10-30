@@ -12,7 +12,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-[82px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <a href="#inicio" aria-label="Alugaí, início"><BrandLogo /></a>
         <nav className="hidden items-center gap-7 text-[13px] font-bold text-[#315a4c] md:flex" aria-label="Navegação principal">
-          <a className="border-b-2 border-transparent py-2 transition-colors hover:border-[#FFB72B] hover:text-[#063f2e]" href="#imoveis">Imóveis</a>
+          <a className="border-b-2 border-transparent py-2 transition-colors hover:border-[#FFB72B] hover:text-[#063f2e]" href="#imoveis">Meu cantinho</a>
           <a className="border-b-2 border-transparent py-2 transition-colors hover:border-[#FFB72B] hover:text-[#063f2e]" href="#como-funciona">Como funciona</a>
           <a className="border-b-2 border-transparent py-2 transition-colors hover:border-[#FFB72B] hover:text-[#063f2e]" href="#para-quem-anuncia">Para quem anuncia</a>
         </nav>

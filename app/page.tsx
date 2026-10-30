@@ -148,17 +148,17 @@ export default function Home() {
         <SiteHeader />
         <main id="inicio">
           <section className="overflow-hidden bg-[#FBF7EB]">
-            <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-[1.05fr_.95fr] lg:gap-20 lg:px-8 lg:py-20">
+            <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-8 sm:px-6 sm:py-10 lg:grid-cols-[1.05fr_.95fr] lg:gap-20 lg:px-8 lg:pb-16 lg:pt-10">
               <div>
-                <p className="mb-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-[#0F7352]"><span className="h-2 w-8 rounded-full bg-[#FFB72B]" /> Aluguel em Manaus</p>
-                <h1 className="max-w-2xl text-[3.25rem] font-black leading-[.94] tracking-[-0.065em] text-[#063f2e] sm:text-6xl lg:text-[4.9rem]">Encontre seu próximo <span className="relative whitespace-nowrap">aluguel.<svg className="absolute -bottom-2 left-0 h-3 w-full text-[#FFB72B]" viewBox="0 0 220 14" preserveAspectRatio="none" aria-hidden="true"><path d="M3 10c46-8 133-8 214-4" fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="round" /></svg></span></h1>
-                <p className="mt-7 max-w-xl text-lg leading-relaxed text-[#48685c]">Tem kitnet no Coroado, apartamento no Parque 10 e casa na Ponta Negra. Cada anúncio mostra quem publicou e quanto custa com as taxas.</p>
+                <p className="mb-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-[#0F7352]"><span className="h-2 w-8 rounded-full bg-[#FFB72B]" /> Feito em Manaus, pra Manaus</p>
+                <h1 className="max-w-2xl text-[3.25rem] font-black leading-[.94] tracking-[-0.065em] text-[#063f2e] sm:text-6xl lg:text-[4.9rem]">Um lugar em Manaus pra chamar de <span className="relative whitespace-nowrap">seu.<svg className="absolute -bottom-2 left-0 h-3 w-full text-[#FFB72B]" viewBox="0 0 220 14" preserveAspectRatio="none" aria-hidden="true"><path d="M3 10c46-8 133-8 214-4" fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="round" /></svg></span></h1>
+                <p className="mt-7 max-w-xl text-lg leading-relaxed text-[#48685c]">Aqui cabe o anúncio da imobiliária e o da dona da kitnet no Coroado. A gente organiza, mostra quem anunciou e deixa o custo bem claro.</p>
 
                 <form onSubmit={handleSearch} className="mt-8 flex max-w-xl items-center gap-2 rounded-[20px] border-2 border-[#063f2e] bg-white p-1.5 shadow-[5px_5px_0_#FFB72B]">
                   <MapPin className="ml-3 size-5 shrink-0 fill-[#FFB72B] text-[#063f2e]" />
                   <Input value={searchInput} onChange={(event) => { setSearchInput(event.target.value); if (searchError) setSearchError("") }} list="bairros-manaus" placeholder="Digite um bairro ou uma região" aria-label="Buscar por bairro ou região" aria-describedby="search-feedback" className="h-12 border-0 bg-transparent px-2 text-base text-[#063f2e] shadow-none placeholder:text-[#789087] focus-visible:ring-0" />
                   <datalist id="bairros-manaus">{properties.map((property) => <option key={property.id} value={property.neighborhood} />)}</datalist>
-                  <Button type="submit" className="size-11 shrink-0 rounded-2xl bg-[#063f2e] p-0 text-white hover:bg-[#0B513B] sm:h-12 sm:w-auto sm:px-5" aria-label="Buscar imóveis"><Search className="size-5" /><span className="hidden font-extrabold sm:inline">Buscar</span></Button>
+                  <Button type="submit" className="size-11 shrink-0 rounded-2xl bg-[#063f2e] p-0 text-white hover:bg-[#0B513B] sm:h-12 sm:w-auto sm:px-5" aria-label="Buscar cantinhos"><Search className="size-5" /><span className="hidden font-extrabold sm:inline">Buscar</span></Button>
                 </form>
                 <div id="search-feedback" aria-live="polite" className="min-h-6 max-w-xl pt-3">{searchError && <p role="alert" className="flex items-start gap-2 rounded-2xl bg-[#FFF0CE] px-4 py-3 text-sm font-bold text-[#7A4A00]"><Search className="mt-0.5 size-4 shrink-0" />{searchError}</p>}</div>
 
@@ -178,7 +178,7 @@ export default function Home() {
                         {availableNeighborhoods.map((neighborhood) => <SelectItem key={neighborhood} value={neighborhood}>{neighborhood}</SelectItem>)}
                       </SelectContent>
                     </Select>
-                    <Button type="button" onClick={handleLocationSearch} className="h-11 rounded-xl bg-[#FFB72B] px-4 font-extrabold text-[#063f2e] shadow-none hover:bg-[#FFC44D]" aria-label="Buscar na localização selecionada">Ver imóveis</Button>
+                    <Button type="button" onClick={handleLocationSearch} className="h-11 rounded-xl bg-[#FFB72B] px-4 font-extrabold text-[#063f2e] shadow-none hover:bg-[#FFC44D]" aria-label="Buscar na localização selecionada">Ver cantinhos</Button>
                   </div>
                 </div>
 
@@ -209,8 +209,8 @@ export default function Home() {
           <section id="imoveis" className="mx-auto max-w-7xl scroll-mt-24 px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
             <div className="mb-8 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
               <div>
-                <p className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#C57C00]"><SlidersHorizontal className="size-4" /> Imóveis disponíveis</p>
-                <h2 className="text-3xl font-black tracking-[-0.045em] text-[#063f2e] sm:text-4xl">{filteredProperties.length === 1 ? "1 imóvel encontrado" : `${filteredProperties.length} imóveis encontrados`}</h2>
+                <p className="mb-2 flex items-center gap-2 text-xs font-black uppercase tracking-[0.14em] text-[#C57C00]"><SlidersHorizontal className="size-4" /> Cantinhos disponíveis</p>
+                <h2 className="text-3xl font-black tracking-[-0.045em] text-[#063f2e] sm:text-4xl">{filteredProperties.length === 1 ? "1 cantinho encontrado" : `${filteredProperties.length} cantinhos encontrados`}</h2>
                 <p className="mt-2 text-sm text-[#60776e]">No mapa, as cores mostram quem publicou cada anúncio.</p>
                 {(query || activeFilter || hasBasicFilters) && <button type="button" onClick={resetFilters} className="mt-2 text-xs font-bold text-[#0F7352] underline decoration-[#FFB72B] decoration-2 underline-offset-4">Limpar busca e ver tudo</button>}
               </div>
@@ -245,8 +245,8 @@ export default function Home() {
               {hasBasicFilters && <Button type="button" onClick={clearBasicFilters} variant="ghost" className="h-9 justify-start rounded-full px-3 text-xs font-bold text-[#60776e] hover:bg-white hover:text-[#063f2e]"><X className="size-3.5" /> Limpar filtros</Button>}
             </div>
 
-            {filteredProperties.length > 0 ? <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,.88fr)_minmax(0,1.12fr)]"><PropertyMap properties={filteredProperties} /><div><div className="grid gap-7 md:grid-cols-2">{visibleProperties.map((property) => <PropertyCard key={property.id} property={property} showTotal={showTotal} />)}</div>{visibleCount < filteredProperties.length && <Button type="button" onClick={() => setVisibleCount((count) => count + 12)} variant="outline" className="mt-7 h-11 w-full rounded-full border-2 border-[#063f2e]/20 bg-[#FBF7EB] font-extrabold text-[#063f2e]">Carregar mais imóveis</Button>}</div></div> : (
-              <div className="rounded-[32px] border-2 border-dashed border-[#063f2e]/20 bg-[#FBF7EB] px-6 py-16 text-center"><span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#FFB72B]"><Search className="size-5" /></span><h2 className="mt-4 text-xl font-black">{hasBasicFilters ? "Nenhum imóvel com esses filtros" : "Lugar não encontrado"}</h2><p className="mt-1 text-sm text-[#60776e]">{hasBasicFilters ? "Tente reduzir a quantidade de filtros para encontrar mais opções." : "Ainda não temos imóveis nesse local. Tente outro bairro ou volte para todos."}</p><Button onClick={() => { resetFilters(); scrollToResults() }} className="mt-5 rounded-full bg-[#063f2e] font-bold">Ver todos</Button></div>
+            {filteredProperties.length > 0 ? <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,.88fr)_minmax(0,1.12fr)]"><PropertyMap properties={filteredProperties} /><div><div className="grid gap-7 md:grid-cols-2">{visibleProperties.map((property) => <PropertyCard key={property.id} property={property} showTotal={showTotal} />)}</div>{visibleCount < filteredProperties.length && <Button type="button" onClick={() => setVisibleCount((count) => count + 12)} variant="outline" className="mt-7 h-11 w-full rounded-full border-2 border-[#063f2e]/20 bg-[#FBF7EB] font-extrabold text-[#063f2e]">Carregar mais cantinhos</Button>}</div></div> : (
+              <div className="rounded-[32px] border-2 border-dashed border-[#063f2e]/20 bg-[#FBF7EB] px-6 py-16 text-center"><span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#FFB72B]"><Search className="size-5" /></span><h2 className="mt-4 text-xl font-black">{hasBasicFilters ? "Nenhum cantinho com esses filtros" : "Lugar não encontrado"}</h2><p className="mt-1 text-sm text-[#60776e]">{hasBasicFilters ? "Tente reduzir a quantidade de filtros para encontrar mais opções." : "Ainda não temos um cantinho nesse local. Tente outro bairro ou volte para todos."}</p><Button onClick={() => { resetFilters(); scrollToResults() }} className="mt-5 rounded-full bg-[#063f2e] font-bold">Ver todos</Button></div>
             )}
           </section>
 
@@ -277,7 +277,7 @@ export default function Home() {
         </main>
 
         <footer className="border-t border-[#063f2e]/10 bg-[#FBF7EB]">
-          <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8"><BrandLogo className="scale-90 origin-left" /><div className="flex items-center gap-2 text-xs font-bold text-[#60776e]"><MapPin className="size-4 fill-[#FFB72B] text-[#063f2e]" /> Imóveis para alugar em Manaus</div></div>
+          <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-8 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8"><BrandLogo className="scale-90 origin-left" /><div className="flex items-center gap-2 text-xs font-bold text-[#60776e]"><MapPin className="size-4 fill-[#FFB72B] text-[#063f2e]" /> Cantinhos para alugar em Manaus</div></div>
         </footer>
       </div>
     </TooltipProvider>

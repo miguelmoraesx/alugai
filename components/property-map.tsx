@@ -163,14 +163,14 @@ export const PropertyMap = memo(function PropertyMap({ properties }: { propertie
         <div className="hidden gap-3 text-[9px] font-bold text-[#526d63] sm:flex"><Legend color="#FFB72B" label="Proprietário" /><Legend color="#0F7352" label="Corretor" /><Legend color="#6C7B76" label="Agregado" /></div>
       </div>
       <div className="relative">
-        <div ref={containerRef} className={cn("w-full bg-[#E8E4D8] transition-[height] duration-300 xl:h-[650px]", expanded ? "h-[470px]" : "h-[170px]")} aria-label="Mapa de imóveis disponíveis em Manaus" />
+        <div ref={containerRef} className={cn("w-full bg-[#E8E4D8] transition-[height] duration-300 xl:h-[650px]", expanded ? "h-[470px]" : "h-[170px]")} aria-label="Mapa de cantinhos disponíveis em Manaus" />
         {activeProperty && mapReady && (!isCompactViewport || expanded) && (
           <div className="absolute inset-x-3 bottom-3 z-[500] rounded-[22px] border border-white/70 bg-[#FFFDF7]/95 p-4 shadow-xl backdrop-blur-md">
             <div className="flex items-start justify-between gap-3">
               <div><p className="text-[10px] font-black uppercase tracking-[.12em] text-[#C57C00]">{activeProperty.neighborhood}</p><p className="mt-1 font-black text-[#063f2e]">{activeProperty.title}</p><p className="mt-1 text-xs text-[#60776e]">{activeProperty.advertiser === "owner" ? "Direto com o proprietário" : activeProperty.advertiser === "broker" ? "Anunciado por corretor" : activeProperty.sourceLabel}</p></div>
               <div className="text-right"><p className="text-lg font-black text-[#063f2e]">{money.format(activeProperty.rent)}</p><p className="text-[10px] text-[#60776e]">aluguel / mês</p></div>
             </div>
-            <Button asChild className="mt-3 h-9 w-full rounded-full bg-[#063f2e] text-xs font-extrabold hover:bg-[#0B513B]"><a href={`#${activeProperty.id}`}>Ver detalhes deste imóvel</a></Button>
+            <Button asChild className="mt-3 h-9 w-full rounded-full bg-[#063f2e] text-xs font-extrabold hover:bg-[#0B513B]"><a href={`#${activeProperty.id}`}>Ver este cantinho</a></Button>
           </div>
         )}
         {!mapReady && <div className="absolute inset-0 flex flex-col items-center justify-center overflow-hidden bg-[#E8E4D8] px-4 text-center"><div className="pointer-events-none absolute inset-0 opacity-35 [background-image:linear-gradient(25deg,transparent_48%,#0F7352_49%,#0F7352_51%,transparent_52%),linear-gradient(-35deg,transparent_48%,#FFB72B_49%,#FFB72B_51%,transparent_52%)] [background-size:90px_72px]" /><span className={cn("relative flex items-center justify-center rounded-full bg-[#FFB72B] shadow-lg", expanded ? "size-12" : "size-9")}><MapPin className={cn("fill-[#063f2e] text-[#063f2e]", expanded ? "size-6" : "size-4.5")} /></span><p className={cn("relative text-sm font-black text-[#063f2e]", expanded ? "mt-4" : "mt-2")}>{shouldLoad ? "Carregando o mapa..." : isCompactViewport ? "O mapa está fechado" : "O mapa abre quando esta seção aparece"}</p>{!shouldLoad && <Button type="button" onClick={() => { setExpanded(true); setShouldLoad(true) }} className="relative mt-3 h-8 rounded-full bg-[#063f2e] px-4 text-xs font-extrabold">Abrir mapa</Button>}</div>}
