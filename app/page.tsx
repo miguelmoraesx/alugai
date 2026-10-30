@@ -153,7 +153,7 @@ export default function Home() {
         <SiteHeader />
         <main id="inicio">
           <section className="overflow-hidden bg-[#FBF7EB]">
-            <div className="mx-auto grid max-w-7xl items-start gap-10 px-4 py-6 sm:px-6 sm:py-8 lg:grid-cols-[1.05fr_.95fr] lg:gap-16 lg:px-8 lg:pb-8 lg:pt-6">
+            <div className="mx-auto grid max-w-7xl items-start gap-10 px-4 py-6 sm:px-6 sm:py-8 lg:grid-cols-[.95fr_1.05fr] lg:gap-12 lg:px-8 lg:pb-8 lg:pt-6">
               <div>
                 <p className="mb-3 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-[#0F7352]"><span className="h-2 w-8 rounded-full bg-[#FFB72B]" /> Feito em Manaus, pra Manaus</p>
                 <h1 className="max-w-2xl text-5xl font-black leading-[.94] tracking-[-0.065em] text-[#063f2e] sm:text-[3.6rem] lg:text-[4.25rem]">Um lugar em Manaus pra chamar de <span className="relative whitespace-nowrap">seu.<svg className="absolute -bottom-2 left-0 h-3 w-full text-[#FFB72B]" viewBox="0 0 220 14" preserveAspectRatio="none" aria-hidden="true"><path d="M3 10c46-8 133-8 214-4" fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="round" /></svg></span></h1>
@@ -195,17 +195,20 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="relative mx-auto w-full max-w-[540px] lg:mx-0 lg:mt-16">
+              <div className="relative mx-auto w-full max-w-[700px] lg:mx-0 lg:mt-12">
                 <div className="absolute -left-6 -top-5 size-20 rounded-[24px] bg-[#FFB72B] sm:-left-9 sm:size-28" />
                 <div className="absolute -bottom-7 -right-8 size-32 rounded-full border-[18px] border-[#0F7352]/12" />
-                <div className="relative overflow-hidden rounded-[48px_48px_48px_12px] border-[6px] border-white bg-white shadow-[0_20px_50px_rgba(6,63,46,.16)]">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-[48px_48px_48px_12px] border-[6px] border-white bg-[#032b20] shadow-[0_20px_50px_rgba(6,63,46,.16)]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={properties[4].images[0]} alt="Casa para alugar na Ponta Negra, em Manaus" className="aspect-[3/2] w-full object-cover" />
-                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#032b20] via-[#032b20]/75 to-transparent px-6 pb-6 pt-24 text-white sm:px-8 sm:pb-8">
+                  <img src={properties[4].images[0]} alt="" aria-hidden="true" className="absolute inset-0 size-full scale-110 object-cover opacity-45 blur-2xl" />
+                  <div className="absolute inset-0 bg-[#032b20]/20" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={properties[4].images[0]} alt="Casa para alugar na Ponta Negra, em Manaus" className="relative z-10 size-full object-contain" />
+                  <div className="absolute inset-x-0 bottom-0 z-20 bg-gradient-to-t from-[#032b20] via-[#032b20]/75 to-transparent px-6 pb-6 pt-24 text-white sm:px-8 sm:pb-8">
                     <p className="text-xs font-bold text-[#FFCA57]">Ponta Negra · Manaus</p><p className="mt-1 text-2xl font-black tracking-[-0.04em]">Casa em condomínio</p><p className="mt-2 text-sm text-white/75">4 quartos · 210 m² · aceita pet</p>
                   </div>
                 </div>
-                <div className="absolute -bottom-5 -left-4 rotate-[-3deg] rounded-[18px] bg-[#FFB72B] px-5 py-4 text-[#063f2e] shadow-lg sm:-left-10">
+                <div className="absolute -bottom-5 -left-4 z-30 rotate-[-3deg] rounded-[18px] bg-[#FFB72B] px-5 py-4 text-[#063f2e] shadow-lg sm:-left-10">
                   <p className="text-[10px] font-black uppercase tracking-[0.12em]">Aluguel + taxas</p><p className="mt-0.5 text-xl font-black">R$ 5.550 <span className="text-xs">/ mês</span></p>
                 </div>
               </div>
