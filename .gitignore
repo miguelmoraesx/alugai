@@ -16,14 +16,10 @@
 next-env.d.ts
 *.tsbuildinfo
 
-# Local caches from development tools; never version these directories
-/.vinext/
+# Local build and runtime caches
 /.wrangler/
-/.sites-runtime/
 /outputs/
 /work/
-/.agents/
-/.codex/
 
 # Test output
 /coverage/
