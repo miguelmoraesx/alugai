@@ -1,7 +1,7 @@
 "use client"
 
-import { useMemo, useState, type FormEvent } from "react"
-import { ArrowUpRight, BedDouble, CarFront, Check, MapPin, Megaphone, PawPrint, Search, SlidersHorizontal, X } from "lucide-react"
+import { useMemo, useState, type FormEvent, type ReactNode } from "react"
+import { ArrowUpRight, Bath, BedDouble, CarFront, Check, CircleDollarSign, MapPin, Megaphone, PawPrint, Search, SlidersHorizontal, X } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { BrandLogo } from "@/components/brand-logo"
 import { PropertyCard } from "@/components/property-card"
@@ -9,6 +9,7 @@ import { PropertyMap } from "@/components/property-map"
 import { properties, quickFilters } from "@/lib/properties"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Toggle } from "@/components/ui/toggle"
@@ -39,8 +40,10 @@ export default function Home() {
   const [selectedRegion, setSelectedRegion] = useState("all")
   const [selectedNeighborhood, setSelectedNeighborhood] = useState("all")
   const [bedroomFilter, setBedroomFilter] = useState("any")
+  const [bathroomFilter, setBathroomFilter] = useState("any")
   const [parkingFilter, setParkingFilter] = useState("any")
   const [petFilter, setPetFilter] = useState("any")
+  const [priceFilter, setPriceFilter] = useState("any")
 
   const filteredProperties = useMemo(() => {
     const search = normalize(query.trim())
@@ -48,15 +51,18 @@ export default function Home() {
       const matchesSearch = !search || normalize(`${property.title} ${property.neighborhood}`).includes(search)
       const matchesZone = !activeFilter || (activeFilter === "owner" ? property.advertiser === "owner" : property.zones.includes(activeFilter))
       const matchesBedrooms = bedroomFilter === "any" || (bedroomFilter === "3+" ? property.bedrooms >= 3 : property.bedrooms === Number(bedroomFilter))
+      const matchesBathrooms = bathroomFilter === "any" || (bathroomFilter === "2+" ? property.bathrooms >= 2 : property.bathrooms === Number(bathroomFilter))
       const matchesParking = parkingFilter === "any" || (parkingFilter === "2+" ? property.parkingSpaces >= 2 : property.parkingSpaces >= Number(parkingFilter))
       const matchesPet = petFilter === "any" || (petFilter === "yes" ? property.petFriendly : !property.petFriendly)
-      return matchesSearch && matchesZone && matchesBedrooms && matchesParking && matchesPet
+      const matchesPrice = priceFilter === "any" || (priceFilter === "2500+" ? property.rent >= 2500 : property.rent <= Number(priceFilter))
+      return matchesSearch && matchesZone && matchesBedrooms && matchesBathrooms && matchesParking && matchesPet && matchesPrice
     })
-  }, [query, activeFilter, bedroomFilter, parkingFilter, petFilter])
+  }, [query, activeFilter, bedroomFilter, bathroomFilter, parkingFilter, petFilter, priceFilter])
 
   const visibleProperties = filteredProperties.slice(0, visibleCount)
   const availableNeighborhoods = locationGroups.find((region) => region.id === selectedRegion)?.neighborhoods ?? []
-  const hasBasicFilters = bedroomFilter !== "any" || parkingFilter !== "any" || petFilter !== "any"
+  const activePropertyFilterCount = [bedroomFilter, bathroomFilter, parkingFilter, petFilter, priceFilter].filter((value) => value !== "any").length
+  const hasBasicFilters = activePropertyFilterCount > 0
   const scrollToResults = () => window.setTimeout(() => document.getElementById("imoveis")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80)
 
   const resetFilters = () => {
@@ -68,14 +74,18 @@ export default function Home() {
     setSelectedRegion("all")
     setSelectedNeighborhood("all")
     setBedroomFilter("any")
+    setBathroomFilter("any")
     setParkingFilter("any")
     setPetFilter("any")
+    setPriceFilter("any")
   }
 
   const clearBasicFilters = () => {
     setBedroomFilter("any")
+    setBathroomFilter("any")
     setParkingFilter("any")
     setPetFilter("any")
+    setPriceFilter("any")
     setVisibleCount(12)
   }
 
@@ -143,49 +153,49 @@ export default function Home() {
         <SiteHeader />
         <main id="inicio">
           <section className="overflow-hidden bg-[#FBF7EB]">
-            <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-8 sm:px-6 sm:py-10 lg:grid-cols-[1.05fr_.95fr] lg:gap-20 lg:px-8 lg:pb-16 lg:pt-10">
+            <div className="mx-auto grid max-w-7xl items-start gap-10 px-4 py-6 sm:px-6 sm:py-8 lg:grid-cols-[1.05fr_.95fr] lg:gap-16 lg:px-8 lg:pb-8 lg:pt-6">
               <div>
-                <p className="mb-5 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-[#0F7352]"><span className="h-2 w-8 rounded-full bg-[#FFB72B]" /> Feito em Manaus, pra Manaus</p>
-                <h1 className="max-w-2xl text-[3.25rem] font-black leading-[.94] tracking-[-0.065em] text-[#063f2e] sm:text-6xl lg:text-[4.9rem]">Um lugar em Manaus pra chamar de <span className="relative whitespace-nowrap">seu.<svg className="absolute -bottom-2 left-0 h-3 w-full text-[#FFB72B]" viewBox="0 0 220 14" preserveAspectRatio="none" aria-hidden="true"><path d="M3 10c46-8 133-8 214-4" fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="round" /></svg></span></h1>
-                <p className="mt-7 max-w-xl text-lg leading-relaxed text-[#48685c]">Aqui cabe o anúncio da imobiliária e o da dona da kitnet no Coroado. A gente organiza, mostra quem anunciou e deixa o custo bem claro.</p>
+                <p className="mb-3 inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.16em] text-[#0F7352]"><span className="h-2 w-8 rounded-full bg-[#FFB72B]" /> Feito em Manaus, pra Manaus</p>
+                <h1 className="max-w-2xl text-5xl font-black leading-[.94] tracking-[-0.065em] text-[#063f2e] sm:text-[3.6rem] lg:text-[4.25rem]">Um lugar em Manaus pra chamar de <span className="relative whitespace-nowrap">seu.<svg className="absolute -bottom-2 left-0 h-3 w-full text-[#FFB72B]" viewBox="0 0 220 14" preserveAspectRatio="none" aria-hidden="true"><path d="M3 10c46-8 133-8 214-4" fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="round" /></svg></span></h1>
+                <p className="mt-5 max-w-xl text-lg leading-relaxed text-[#48685c]">Aqui cabe o anúncio da imobiliária e o da dona da kitnet no Coroado. A gente organiza, mostra quem anunciou e deixa o custo bem claro.</p>
 
-                <form onSubmit={handleSearch} className="mt-8 flex max-w-xl items-center gap-2 rounded-[20px] border-2 border-[#063f2e] bg-white p-1.5 shadow-[5px_5px_0_#FFB72B]">
+                <form onSubmit={handleSearch} className="mt-6 flex max-w-xl items-center gap-2 rounded-[20px] border-2 border-[#063f2e] bg-white p-1.5 shadow-[5px_5px_0_#FFB72B]">
                   <MapPin className="ml-3 size-5 shrink-0 fill-[#FFB72B] text-[#063f2e]" />
-                  <Input value={searchInput} onChange={(event) => { setSearchInput(event.target.value); if (searchError) setSearchError("") }} list="bairros-manaus" placeholder="Digite um bairro ou uma região" aria-label="Buscar por bairro ou região" aria-describedby="search-feedback" className="h-12 border-0 bg-transparent px-2 text-base text-[#063f2e] shadow-none placeholder:text-[#789087] focus-visible:ring-0" />
+                  <Input value={searchInput} onChange={(event) => { setSearchInput(event.target.value); if (searchError) setSearchError("") }} list="bairros-manaus" placeholder="Digite um bairro ou uma região" aria-label="Buscar por bairro ou região" aria-describedby={searchError ? "search-feedback" : undefined} className="h-12 border-0 bg-transparent px-2 text-base text-[#063f2e] shadow-none placeholder:text-[#789087] focus-visible:ring-0" />
                   <datalist id="bairros-manaus">{properties.map((property) => <option key={property.id} value={property.neighborhood} />)}</datalist>
                   <Button type="submit" className="size-11 shrink-0 rounded-2xl bg-[#063f2e] p-0 text-white hover:bg-[#0B513B] sm:h-12 sm:w-auto sm:px-5" aria-label="Buscar cantinhos"><Search className="size-5" /><span className="hidden font-extrabold sm:inline">Buscar</span></Button>
                 </form>
-                <div id="search-feedback" aria-live="polite" className="min-h-6 max-w-xl pt-3">{searchError && <p role="alert" className="flex items-start gap-2 rounded-2xl bg-[#FFF0CE] px-4 py-3 text-sm font-bold text-[#7A4A00]"><Search className="mt-0.5 size-4 shrink-0" />{searchError}</p>}</div>
+                {searchError && <div id="search-feedback" aria-live="polite" className="max-w-xl pt-3"><p role="alert" className="flex items-start gap-2 rounded-2xl bg-[#FFF0CE] px-4 py-3 text-sm font-bold text-[#7A4A00]"><Search className="mt-0.5 size-4 shrink-0" />{searchError}</p></div>}
 
-                <div className="mt-3 max-w-xl rounded-[20px] border border-[#063f2e]/12 bg-white/65 p-3.5">
-                  <p className="mb-2.5 text-[11px] font-extrabold uppercase tracking-[0.1em] text-[#60776e]">Ou escolha pela lista</p>
+                <div className="mt-2 max-w-xl rounded-[20px] border border-[#063f2e]/12 bg-white/65 p-3">
+                  <p className="mb-2 text-[11px] font-extrabold uppercase tracking-[0.1em] text-[#60776e]">Ou escolha pela lista</p>
                   <div className="grid gap-2 sm:grid-cols-[1fr_1.25fr_auto]">
                     <Select value={selectedRegion} onValueChange={(value) => { setSelectedRegion(value); setSelectedNeighborhood("all"); setSearchError("") }}>
-                      <SelectTrigger className="h-11 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Escolher zona de Manaus"><SelectValue>{selectedRegion === "all" ? "Todas as zonas" : locationGroups.find((region) => region.id === selectedRegion)?.label}</SelectValue></SelectTrigger>
+                      <SelectTrigger className="h-10 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Escolher zona de Manaus"><SelectValue>{selectedRegion === "all" ? "Todas as zonas" : locationGroups.find((region) => region.id === selectedRegion)?.label}</SelectValue></SelectTrigger>
                       <SelectContent className="border-[#063f2e]/10 bg-[#FFFDF7]">
                         <SelectItem value="all">Todas as zonas</SelectItem>
                         {locationGroups.map((region) => <SelectItem key={region.id} value={region.id}>{region.emoji} {region.label}</SelectItem>)}
                       </SelectContent>
                     </Select>
                     <Select value={selectedNeighborhood} onValueChange={(value) => { setSelectedNeighborhood(value); setSearchError("") }}>
-                      <SelectTrigger className="h-11 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Escolher bairro"><SelectValue>{selectedRegion === "all" ? "Todos os bairros" : selectedNeighborhood === "all" ? "Todos os bairros da zona" : selectedNeighborhood}</SelectValue></SelectTrigger>
+                      <SelectTrigger className="h-10 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Escolher bairro"><SelectValue>{selectedRegion === "all" ? "Todos os bairros" : selectedNeighborhood === "all" ? "Todos os bairros da zona" : selectedNeighborhood}</SelectValue></SelectTrigger>
                       <SelectContent className="border-[#063f2e]/10 bg-[#FFFDF7]">
                         <SelectItem value="all">Todos os bairros da zona</SelectItem>
                         {availableNeighborhoods.map((neighborhood) => <SelectItem key={neighborhood} value={neighborhood}>{neighborhood}</SelectItem>)}
                       </SelectContent>
                     </Select>
-                    <Button type="button" onClick={handleLocationSearch} className="h-11 rounded-xl bg-[#FFB72B] px-4 font-extrabold text-[#063f2e] shadow-none hover:bg-[#FFC44D]" aria-label="Buscar na localização selecionada">Ver cantinhos</Button>
+                    <Button type="button" onClick={handleLocationSearch} className="h-10 rounded-xl bg-[#FFB72B] px-4 font-extrabold text-[#063f2e] shadow-none hover:bg-[#FFC44D]" aria-label="Buscar na localização selecionada">Ver cantinhos</Button>
                   </div>
                 </div>
 
-                <div className="mt-6 flex max-w-2xl flex-wrap gap-2" aria-label="Filtros rápidos">
+                <div className="mt-4 flex max-w-2xl flex-wrap gap-2" aria-label="Filtros rápidos">
                   {quickFilters.map((filter) => (
                     <button key={filter.id} type="button" onClick={() => handleQuickFilter(filter.id)} aria-pressed={activeFilter === filter.id} className={cn("rounded-full border px-3.5 py-2 text-xs font-bold transition", activeFilter === filter.id ? "border-[#063f2e] bg-[#063f2e] text-white" : "border-[#063f2e]/15 bg-white/60 text-[#315a4c] hover:border-[#FFB72B] hover:bg-[#FFB72B]/15")}><span className="mr-1.5" aria-hidden="true">{filter.emoji}</span>{filter.label}</button>
                   ))}
                 </div>
               </div>
 
-              <div className="relative mx-auto w-full max-w-[540px] lg:mx-0">
+              <div className="relative mx-auto w-full max-w-[540px] lg:mx-0 lg:mt-16">
                 <div className="absolute -left-6 -top-5 size-20 rounded-[24px] bg-[#FFB72B] sm:-left-9 sm:size-28" />
                 <div className="absolute -bottom-7 -right-8 size-32 rounded-full border-[18px] border-[#0F7352]/12" />
                 <div className="relative overflow-hidden rounded-[48px_48px_48px_12px] border-[6px] border-white bg-white shadow-[0_20px_50px_rgba(6,63,46,.16)]">
@@ -210,42 +220,53 @@ export default function Home() {
                 <p className="mt-2 text-sm text-[#60776e]">No mapa, as cores mostram quem publicou cada anúncio.</p>
                 {(query || activeFilter || hasBasicFilters) && <button type="button" onClick={resetFilters} className="mt-2 text-xs font-bold text-[#0F7352] underline decoration-[#FFB72B] decoration-2 underline-offset-4">Limpar busca e ver tudo</button>}
               </div>
-              <Toggle pressed={showTotal} onPressedChange={setShowTotal} variant="outline" className="h-auto min-h-12 justify-start rounded-full border-2 border-[#063f2e]/15 bg-[#FBF7EB] px-4 py-2.5 text-left text-xs font-bold text-[#315a4c] shadow-none hover:bg-white data-[state=on]:border-[#063f2e] data-[state=on]:bg-[#063f2e] data-[state=on]:text-white sm:text-sm" aria-label="Exibir custo total mensal">
-                <span className={cn("relative h-6 w-10 shrink-0 rounded-full bg-[#C9C4B6] transition-colors", showTotal && "bg-[#FFB72B]")}><span className={cn("absolute left-1 top-1 size-4 rounded-full bg-white shadow-sm transition-transform", showTotal && "translate-x-4 bg-[#063f2e]")} /></span>
-                Somar aluguel + condomínio + IPTU
-              </Toggle>
-            </div>
-
-            <div className="mb-8 flex flex-col gap-3 rounded-[24px] border border-[#063f2e]/12 bg-[#FBF7EB] p-3.5 sm:flex-row sm:items-center">
-              <div className="flex items-center gap-2 px-1 text-xs font-black uppercase tracking-[0.1em] text-[#60776e]"><SlidersHorizontal className="size-4 text-[#C57C00]" /> Filtros dos anúncios</div>
-              <div className="grid flex-1 gap-2 sm:grid-cols-3 lg:ml-auto lg:max-w-2xl">
-                <Select value={bedroomFilter} onValueChange={(value) => { setBedroomFilter(value); setVisibleCount(12) }}>
-                  <SelectTrigger className="h-10 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Filtrar por número de quartos"><BedDouble className="size-4 text-[#0F7352]" /><SelectValue>{bedroomFilter === "any" ? "Quartos: qualquer" : bedroomFilter === "3+" ? "3 quartos ou mais" : `${bedroomFilter} ${bedroomFilter === "1" ? "quarto" : "quartos"}`}</SelectValue></SelectTrigger>
-                  <SelectContent className="border-[#063f2e]/10 bg-[#FFFDF7]">
-                    <SelectItem value="any">Quartos: qualquer</SelectItem>
-                    <SelectItem value="1">1 quarto</SelectItem>
-                    <SelectItem value="2">2 quartos</SelectItem>
-                    <SelectItem value="3+">3 quartos ou mais</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={parkingFilter} onValueChange={(value) => { setParkingFilter(value); setVisibleCount(12) }}>
-                  <SelectTrigger className="h-10 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Filtrar por vagas de garagem"><CarFront className="size-4 text-[#0F7352]" /><SelectValue>{parkingFilter === "any" ? "Garagem: qualquer" : parkingFilter === "2+" ? "2 vagas ou mais" : "1 vaga ou mais"}</SelectValue></SelectTrigger>
-                  <SelectContent className="border-[#063f2e]/10 bg-[#FFFDF7]">
-                    <SelectItem value="any">Garagem: qualquer</SelectItem>
-                    <SelectItem value="1">1 vaga ou mais</SelectItem>
-                    <SelectItem value="2+">2 vagas ou mais</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={petFilter} onValueChange={(value) => { setPetFilter(value); setVisibleCount(12) }}>
-                  <SelectTrigger className="h-10 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Filtrar por aceite de animais"><PawPrint className="size-4 text-[#0F7352]" /><SelectValue>{petFilter === "any" ? "Pet: qualquer" : petFilter === "yes" ? "Aceita pet: sim" : "Aceita pet: não"}</SelectValue></SelectTrigger>
-                  <SelectContent className="border-[#063f2e]/10 bg-[#FFFDF7]">
-                    <SelectItem value="any">Pet: qualquer</SelectItem>
-                    <SelectItem value="yes">Aceita pet: sim</SelectItem>
-                    <SelectItem value="no">Aceita pet: não</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <Toggle pressed={showTotal} onPressedChange={setShowTotal} variant="outline" className="h-auto min-h-12 justify-start rounded-full border-2 border-[#063f2e]/15 bg-[#FBF7EB] px-4 py-2.5 text-left text-xs font-bold text-[#315a4c] shadow-none hover:bg-white data-[state=on]:border-[#063f2e] data-[state=on]:bg-[#063f2e] data-[state=on]:text-white sm:text-sm" aria-label="Exibir custo total mensal">
+                  <span className={cn("relative h-6 w-10 shrink-0 rounded-full bg-[#C9C4B6] transition-colors", showTotal && "bg-[#FFB72B]")}><span className={cn("absolute left-1 top-1 size-4 rounded-full bg-white shadow-sm transition-transform", showTotal && "translate-x-4 bg-[#063f2e]")} /></span>
+                  Somar aluguel + condomínio + IPTU
+                </Toggle>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button type="button" variant="outline" className="h-12 rounded-full border-2 border-[#063f2e] bg-[#FBF7EB] px-5 font-extrabold text-[#063f2e] shadow-none hover:bg-[#063f2e] hover:text-white"><SlidersHorizontal className="size-4" /> Filtros {activePropertyFilterCount > 0 && <span className="flex size-5 items-center justify-center rounded-full bg-[#FFB72B] text-[10px] text-[#063f2e]">{activePropertyFilterCount}</span>}</Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[90vh] overflow-y-auto rounded-[28px] border-0 bg-[#FBF7EB] p-6 sm:max-w-2xl sm:p-8">
+                    <DialogHeader className="pr-8"><DialogTitle className="text-3xl font-black tracking-[-0.04em] text-[#063f2e]">Filtrar cantinhos</DialogTitle><DialogDescription className="text-[#60776e]">Escolha o que importa para sua busca. Os filtros funcionam junto com bairro e região.</DialogDescription></DialogHeader>
+                    <div className="grid gap-4 py-2 sm:grid-cols-2">
+                      <FilterField label="Quartos">
+                        <Select value={bedroomFilter} onValueChange={(value) => { setBedroomFilter(value); setVisibleCount(12) }}>
+                          <SelectTrigger className="h-11 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none"><BedDouble className="size-4 text-[#0F7352]" /><SelectValue>{bedroomFilter === "any" ? "Qualquer" : bedroomFilter === "3+" ? "3 ou mais" : bedroomFilter}</SelectValue></SelectTrigger>
+                          <SelectContent className="z-[70] border-[#063f2e]/10 bg-[#FFFDF7]"><SelectItem value="any">Qualquer</SelectItem><SelectItem value="1">1 quarto</SelectItem><SelectItem value="2">2 quartos</SelectItem><SelectItem value="3+">3 quartos ou mais</SelectItem></SelectContent>
+                        </Select>
+                      </FilterField>
+                      <FilterField label="Banheiros">
+                        <Select value={bathroomFilter} onValueChange={(value) => { setBathroomFilter(value); setVisibleCount(12) }}>
+                          <SelectTrigger className="h-11 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none"><Bath className="size-4 text-[#0F7352]" /><SelectValue>{bathroomFilter === "any" ? "Qualquer" : bathroomFilter === "2+" ? "2 ou mais" : bathroomFilter}</SelectValue></SelectTrigger>
+                          <SelectContent className="z-[70] border-[#063f2e]/10 bg-[#FFFDF7]"><SelectItem value="any">Qualquer</SelectItem><SelectItem value="1">1 banheiro</SelectItem><SelectItem value="2+">2 banheiros ou mais</SelectItem></SelectContent>
+                        </Select>
+                      </FilterField>
+                      <FilterField label="Garagem">
+                        <Select value={parkingFilter} onValueChange={(value) => { setParkingFilter(value); setVisibleCount(12) }}>
+                          <SelectTrigger className="h-11 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none"><CarFront className="size-4 text-[#0F7352]" /><SelectValue>{parkingFilter === "any" ? "Qualquer" : parkingFilter === "2+" ? "2 vagas ou mais" : "1 vaga ou mais"}</SelectValue></SelectTrigger>
+                          <SelectContent className="z-[70] border-[#063f2e]/10 bg-[#FFFDF7]"><SelectItem value="any">Qualquer</SelectItem><SelectItem value="1">1 vaga ou mais</SelectItem><SelectItem value="2+">2 vagas ou mais</SelectItem></SelectContent>
+                        </Select>
+                      </FilterField>
+                      <FilterField label="Pet">
+                        <Select value={petFilter} onValueChange={(value) => { setPetFilter(value); setVisibleCount(12) }}>
+                          <SelectTrigger className="h-11 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none"><PawPrint className="size-4 text-[#0F7352]" /><SelectValue>{petFilter === "any" ? "Qualquer" : petFilter === "yes" ? "Aceita pet: sim" : "Aceita pet: não"}</SelectValue></SelectTrigger>
+                          <SelectContent className="z-[70] border-[#063f2e]/10 bg-[#FFFDF7]"><SelectItem value="any">Qualquer</SelectItem><SelectItem value="yes">Aceita pet: sim</SelectItem><SelectItem value="no">Aceita pet: não</SelectItem></SelectContent>
+                        </Select>
+                      </FilterField>
+                      <FilterField label="Faixa de aluguel" className="sm:col-span-2">
+                        <Select value={priceFilter} onValueChange={(value) => { setPriceFilter(value); setVisibleCount(12) }}>
+                          <SelectTrigger className="h-11 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none"><CircleDollarSign className="size-4 text-[#0F7352]" /><SelectValue>{priceFilter === "any" ? "Qualquer valor" : priceFilter === "2500+" ? "A partir de R$ 2.500" : `Até R$ ${Number(priceFilter).toLocaleString("pt-BR")}`}</SelectValue></SelectTrigger>
+                          <SelectContent className="z-[70] border-[#063f2e]/10 bg-[#FFFDF7]"><SelectItem value="any">Qualquer valor</SelectItem><SelectItem value="1200">Até R$ 1.200</SelectItem><SelectItem value="1800">Até R$ 1.800</SelectItem><SelectItem value="2500">Até R$ 2.500</SelectItem><SelectItem value="2500+">A partir de R$ 2.500</SelectItem></SelectContent>
+                        </Select>
+                      </FilterField>
+                    </div>
+                    <DialogFooter className="border-t border-[#063f2e]/10 pt-4 sm:justify-between"><Button type="button" onClick={clearBasicFilters} variant="ghost" disabled={!hasBasicFilters} className="rounded-full font-bold text-[#60776e]"><X className="size-4" /> Limpar filtros</Button><DialogClose asChild><Button className="h-11 rounded-full bg-[#063f2e] px-6 font-extrabold text-white hover:bg-[#0B513B]">Ver {filteredProperties.length} {filteredProperties.length === 1 ? "cantinho" : "cantinhos"}</Button></DialogClose></DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
-              {hasBasicFilters && <Button type="button" onClick={clearBasicFilters} variant="ghost" className="h-9 justify-start rounded-full px-3 text-xs font-bold text-[#60776e] hover:bg-white hover:text-[#063f2e]"><X className="size-3.5" /> Limpar filtros</Button>}
             </div>
 
             {filteredProperties.length > 0 ? <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,.88fr)_minmax(0,1.12fr)]"><PropertyMap properties={filteredProperties} /><div><div className="grid gap-7 md:grid-cols-2">{visibleProperties.map((property) => <PropertyCard key={property.id} property={property} showTotal={showTotal} />)}</div>{visibleCount < filteredProperties.length && <Button type="button" onClick={() => setVisibleCount((count) => count + 12)} variant="outline" className="mt-7 h-11 w-full rounded-full border-2 border-[#063f2e]/20 bg-[#FBF7EB] font-extrabold text-[#063f2e]">Carregar mais cantinhos</Button>}</div></div> : (
@@ -285,4 +306,8 @@ export default function Home() {
       </div>
     </TooltipProvider>
   )
+}
+
+function FilterField({ label, children, className }: { label: string; children: ReactNode; className?: string }) {
+  return <div className={cn("grid gap-2", className)}><p className="text-xs font-extrabold uppercase tracking-[0.08em] text-[#60776e]">{label}</p>{children}</div>
 }
