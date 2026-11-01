@@ -9,19 +9,24 @@ import { Button } from "@/components/ui/button"
 
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 })
 
-export const PropertyMap = memo(function PropertyMap({ properties }: { properties: Property[] }) {
+type PropertyMapProps = {
+  properties: Property[]
+  activePropertyId: string | null
+  onPropertySelect: (propertyId: string) => void
+}
+
+export const PropertyMap = memo(function PropertyMap({ properties, activePropertyId, onPropertySelect }: PropertyMapProps) {
   const shellRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<LeafletMap | null>(null)
   const libraryRef = useRef<typeof import("leaflet") | null>(null)
-  const markersRef = useRef<LeafletMarker[]>([])
+  const markersRef = useRef<Map<string, LeafletMarker>>(new Map())
   const [shouldLoad, setShouldLoad] = useState(false)
   const [mapReady, setMapReady] = useState(false)
   const [viewportReady, setViewportReady] = useState(false)
   const [isCompactViewport, setIsCompactViewport] = useState(false)
   const [expanded, setExpanded] = useState(false)
-  const [selected, setSelected] = useState<Property | null>(properties[0] ?? null)
-  const activeProperty = properties.find((property) => property.id === selected?.id) ?? properties[0] ?? null
+  const activeProperty = properties.find((property) => property.id === activePropertyId) ?? properties[0] ?? null
 
   useEffect(() => {
     const media = window.matchMedia("(max-width: 1279px)")
@@ -81,9 +86,9 @@ export const PropertyMap = memo(function PropertyMap({ properties }: { propertie
         crossOrigin: true,
         detectRetina: false,
         updateWhenZooming: false,
-        updateWhenIdle: false,
-        updateInterval: 100,
-        keepBuffer: 3,
+        updateWhenIdle: true,
+        updateInterval: 200,
+        keepBuffer: 4,
       }).addTo(map)
 
       const ufamLabel = document.createElement("div")
@@ -100,6 +105,7 @@ export const PropertyMap = memo(function PropertyMap({ properties }: { propertie
     createMap()
     return () => {
       cancelled = true
+      markersRef.current.clear()
       mapRef.current?.remove()
       mapRef.current = null
     }
@@ -130,10 +136,22 @@ export const PropertyMap = memo(function PropertyMap({ properties }: { propertie
   useEffect(() => {
     if (!mapReady || !mapRef.current || !libraryRef.current) return
     const L = libraryRef.current
-    markersRef.current.forEach((marker) => marker.remove())
-    markersRef.current = []
+    if (!(markersRef.current instanceof Map)) {
+      const legacyMarkers = markersRef.current as unknown as LeafletMarker[]
+      legacyMarkers.forEach((marker) => marker.remove())
+      markersRef.current = new Map()
+    }
+    const visibleIds = new Set(properties.map((property) => property.id))
+
+    markersRef.current.forEach((marker, propertyId) => {
+      if (!visibleIds.has(propertyId)) {
+        marker.remove()
+        markersRef.current.delete(propertyId)
+      }
+    })
 
     properties.forEach((property) => {
+      if (markersRef.current.has(property.id)) return
       const markerButton = document.createElement("button")
       markerButton.type = "button"
       markerButton.className = `alugai-map-marker alugai-map-marker--${property.advertiser}`
@@ -144,17 +162,24 @@ export const PropertyMap = memo(function PropertyMap({ properties }: { propertie
         title: `Ver ${property.title} em ${property.neighborhood}`,
         keyboard: true,
       }).on("click", () => {
-        setSelected(property)
+        onPropertySelect(property.id)
         mapRef.current?.setView([property.latitude, property.longitude], 14, { animate: false })
       }).addTo(mapRef.current!)
-      markersRef.current.push(marker)
+      markersRef.current.set(property.id, marker)
     })
 
     if (properties.length > 0) {
       const bounds = L.latLngBounds(properties.map((property) => [property.latitude, property.longitude]))
       mapRef.current.fitBounds(bounds, { padding: [55, 55], maxZoom: 13, animate: false })
     }
-  }, [mapReady, properties])
+  }, [mapReady, onPropertySelect, properties])
+
+  useEffect(() => {
+    if (!mapReady) return
+    markersRef.current.forEach((marker, propertyId) => {
+      marker.getElement()?.classList.toggle("is-active", propertyId === activeProperty?.id)
+    })
+  }, [activeProperty?.id, mapReady, properties])
 
   return (
     <div ref={shellRef} className="overflow-hidden rounded-[30px] border-2 border-[#063f2e]/15 bg-[#FBF7EB] shadow-[0_10px_0_rgba(6,63,46,.06)] xl:sticky xl:top-[98px]">

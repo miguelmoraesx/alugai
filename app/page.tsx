@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState, type FormEvent, type ReactNode } from "react"
-import { ArrowUpRight, Bath, BedDouble, CarFront, Check, CircleDollarSign, MapPin, Megaphone, PawPrint, Search, SlidersHorizontal, X } from "lucide-react"
+import { Bath, BedDouble, CarFront, Check, CheckCircle2, CircleDollarSign, MapPin, Megaphone, PawPrint, Search, SlidersHorizontal, X } from "lucide-react"
 import { SiteHeader } from "@/components/site-header"
 import { BrandLogo } from "@/components/brand-logo"
 import { PropertyCard } from "@/components/property-card"
@@ -30,6 +30,8 @@ const locationGroups = quickFilters
     neighborhoods: [...new Set(properties.filter((property) => property.zones.includes(region.id)).map((property) => property.neighborhood))].sort((a, b) => a.localeCompare(b, "pt-BR")),
   }))
 
+const allNeighborhoods = [...new Set(properties.map((property) => property.neighborhood))].sort((a, b) => a.localeCompare(b, "pt-BR"))
+
 export default function Home() {
   const [searchInput, setSearchInput] = useState("")
   const [query, setQuery] = useState("")
@@ -44,6 +46,7 @@ export default function Home() {
   const [parkingFilter, setParkingFilter] = useState("any")
   const [petFilter, setPetFilter] = useState("any")
   const [priceFilter, setPriceFilter] = useState("any")
+  const [focusedPropertyId, setFocusedPropertyId] = useState<string | null>(null)
 
   const filteredProperties = useMemo(() => {
     const search = normalize(query.trim())
@@ -60,7 +63,7 @@ export default function Home() {
   }, [query, activeFilter, bedroomFilter, bathroomFilter, parkingFilter, petFilter, priceFilter])
 
   const visibleProperties = filteredProperties.slice(0, visibleCount)
-  const availableNeighborhoods = locationGroups.find((region) => region.id === selectedRegion)?.neighborhoods ?? []
+  const availableNeighborhoods = selectedRegion === "all" ? allNeighborhoods : locationGroups.find((region) => region.id === selectedRegion)?.neighborhoods ?? []
   const activePropertyFilterCount = [bedroomFilter, bathroomFilter, parkingFilter, petFilter, priceFilter].filter((value) => value !== "any").length
   const hasBasicFilters = activePropertyFilterCount > 0
   const scrollToResults = () => window.setTimeout(() => document.getElementById("imoveis")?.scrollIntoView({ behavior: "smooth", block: "start" }), 80)
@@ -178,9 +181,9 @@ export default function Home() {
                       </SelectContent>
                     </Select>
                     <Select value={selectedNeighborhood} onValueChange={(value) => { setSelectedNeighborhood(value); setSearchError("") }}>
-                      <SelectTrigger className="h-10 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Escolher bairro"><SelectValue>{selectedRegion === "all" ? "Todos os bairros" : selectedNeighborhood === "all" ? "Todos os bairros da zona" : selectedNeighborhood}</SelectValue></SelectTrigger>
+                      <SelectTrigger className="h-10 w-full rounded-xl border-[#063f2e]/15 bg-white font-bold text-[#315a4c] shadow-none" aria-label="Escolher bairro"><SelectValue>{selectedNeighborhood !== "all" ? selectedNeighborhood : selectedRegion === "all" ? "Todos os bairros" : "Todos os bairros da zona"}</SelectValue></SelectTrigger>
                       <SelectContent className="border-[#063f2e]/10 bg-[#FFFDF7]">
-                        <SelectItem value="all">Todos os bairros da zona</SelectItem>
+                        <SelectItem value="all">{selectedRegion === "all" ? "Todos os bairros" : "Todos os bairros da zona"}</SelectItem>
                         {availableNeighborhoods.map((neighborhood) => <SelectItem key={neighborhood} value={neighborhood}>{neighborhood}</SelectItem>)}
                       </SelectContent>
                     </Select>
@@ -272,7 +275,7 @@ export default function Home() {
               </div>
             </div>
 
-            {filteredProperties.length > 0 ? <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,.88fr)_minmax(0,1.12fr)]"><PropertyMap properties={filteredProperties} /><div><div className="grid gap-7 md:grid-cols-2">{visibleProperties.map((property) => <PropertyCard key={property.id} property={property} showTotal={showTotal} />)}</div>{visibleCount < filteredProperties.length && <Button type="button" onClick={() => setVisibleCount((count) => count + 12)} variant="outline" className="mt-7 h-11 w-full rounded-full border-2 border-[#063f2e]/20 bg-[#FBF7EB] font-extrabold text-[#063f2e]">Carregar mais cantinhos</Button>}</div></div> : (
+            {filteredProperties.length > 0 ? <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,.88fr)_minmax(0,1.12fr)]"><PropertyMap properties={filteredProperties} activePropertyId={focusedPropertyId} onPropertySelect={setFocusedPropertyId} /><div><div className="grid gap-7 md:grid-cols-2">{visibleProperties.map((property) => <PropertyCard key={property.id} property={property} showTotal={showTotal} isHighlighted={focusedPropertyId === property.id} onHighlight={setFocusedPropertyId} />)}</div>{visibleCount < filteredProperties.length && <Button type="button" onClick={() => setVisibleCount((count) => count + 12)} variant="outline" className="mt-7 h-11 w-full rounded-full border-2 border-[#063f2e]/20 bg-[#FBF7EB] font-extrabold text-[#063f2e]">Carregar mais cantinhos</Button>}</div></div> : (
               <div className="rounded-[32px] border-2 border-dashed border-[#063f2e]/20 bg-[#FBF7EB] px-6 py-16 text-center"><span className="mx-auto flex size-12 items-center justify-center rounded-full bg-[#FFB72B]"><Search className="size-5" /></span><h2 className="mt-4 text-xl font-black">{hasBasicFilters ? "Nenhum cantinho com esses filtros" : "Lugar não encontrado"}</h2><p className="mt-1 text-sm text-[#60776e]">{hasBasicFilters ? "Tente reduzir a quantidade de filtros para encontrar mais opções." : "Ainda não temos um cantinho nesse local. Tente outro bairro ou volte para todos."}</p><Button onClick={() => { resetFilters(); scrollToResults() }} className="mt-5 rounded-full bg-[#063f2e] font-bold">Ver todos</Button></div>
             )}
           </section>
@@ -283,7 +286,7 @@ export default function Home() {
                 <div><p className="text-xs font-black uppercase tracking-[0.16em] text-[#FFB72B]">Como funciona</p><h2 className="mt-4 text-4xl font-black leading-tight tracking-[-0.05em] sm:text-5xl">Veja preço, taxas e origem no mesmo lugar.</h2><p className="mt-5 max-w-md leading-relaxed text-[#B9CEC6]">Cada anúncio separa aluguel, condomínio e IPTU. Você também vê se quem publicou foi proprietário, corretor ou outra plataforma.</p></div>
                 <div className="divide-y divide-white/15 border-y border-white/15">
                   {["Busque pelo bairro, pela zona ou por um ponto de referência.", "Confira fotos, vagas, taxas e quem publicou o anúncio.", "Abra o WhatsApp com o código do imóvel já preenchido."].map((text, index) => (
-                    <div key={text} className="grid grid-cols-[54px_1fr_auto] items-center gap-3 py-6 sm:py-7"><span className="text-sm font-black text-[#FFB72B]">0{index + 1}</span><p className="text-lg font-bold leading-snug sm:text-xl">{text}</p><ArrowUpRight className="size-5 text-[#FFB72B]" /></div>
+                    <div key={text} className="grid grid-cols-[54px_1fr_auto] items-center gap-3 py-6 sm:py-7"><span className="text-sm font-black text-[#FFB72B]">0{index + 1}</span><p className="text-lg font-bold leading-snug sm:text-xl">{text}</p><span className="flex size-8 items-center justify-center rounded-full bg-white/10" aria-hidden="true"><CheckCircle2 className="size-4 text-[#FFB72B]" /></span></div>
                   ))}
                 </div>
               </div>

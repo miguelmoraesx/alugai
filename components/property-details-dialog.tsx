@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { BadgeCheck, Bath, BedDouble, CarFront, ChevronLeft, ChevronRight, MapPin, MessageCircle, PawPrint, Square, UserRound } from "lucide-react"
+import { BadgeCheck, Bath, BedDouble, CarFront, Check, ChevronLeft, ChevronRight, MapPin, MessageCircle, PawPrint, Share2, Square, UserRound } from "lucide-react"
 import type { Property } from "@/lib/properties"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -11,6 +11,8 @@ const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL
 
 export function PropertyDetailsDialog({ property }: { property: Property }) {
   const [photo, setPhoto] = useState(0)
+  const [photoFailed, setPhotoFailed] = useState(false)
+  const [copied, setCopied] = useState(false)
   const total = property.rent + property.condo + property.iptu
   const isOwner = property.advertiser === "owner"
   const isBroker = property.advertiser === "broker"
@@ -18,7 +20,25 @@ export function PropertyDetailsDialog({ property }: { property: Property }) {
   const contactLabel = isOwner ? "Falar com proprietário" : isBroker ? "Falar com corretor" : "Pedir contato no WhatsApp"
   const whatsappText = `Olá! Vi o imóvel #${property.id} (${property.neighborhood}) no Alugaí e quero saber mais.`
   const whatsappUrl = `https://wa.me/5592999999999?text=${encodeURIComponent(whatsappText)}`
-  const movePhoto = (direction: number) => setPhoto((current) => (current + direction + property.images.length) % property.images.length)
+  const movePhoto = (direction: number) => {
+    setPhotoFailed(false)
+    setPhoto((current) => (current + direction + property.images.length) % property.images.length)
+  }
+  const shareProperty = async () => {
+    const url = `${window.location.origin}${window.location.pathname}#${property.id}`
+    const data = { title: `${property.title} em ${property.neighborhood}`, text: `Olha este cantinho no Alugaí: ${property.title} em ${property.neighborhood}.`, url }
+    try {
+      if (navigator.share) {
+        await navigator.share(data)
+      } else {
+        await navigator.clipboard.writeText(`${data.text} ${url}`)
+        setCopied(true)
+        window.setTimeout(() => setCopied(false), 2000)
+      }
+    } catch {
+      // O usuário pode cancelar o compartilhamento sem alterar o anúncio.
+    }
+  }
 
   return (
     <Dialog>
@@ -29,15 +49,19 @@ export function PropertyDetailsDialog({ property }: { property: Property }) {
         <div className="grid lg:grid-cols-[1.08fr_.92fr]">
           <div className="bg-[#E8E4D8] p-3 sm:p-5">
             <div className="relative overflow-hidden rounded-[22px] bg-[#DAD5C7]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={property.images[photo]} alt={`${property.title} em ${property.neighborhood}, foto ampliada ${photo + 1}`} decoding="async" className="aspect-[4/3] size-full object-cover" />
+              {photoFailed ? (
+                <div className="flex aspect-[4/3] size-full flex-col items-center justify-center gap-2 text-sm font-bold text-[#60776e]"><BadgeCheck className="size-8 text-[#0F7352]" /><span>Foto indisponível</span></div>
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img src={property.images[photo]} alt={`${property.title} em ${property.neighborhood}, foto ampliada ${photo + 1}`} decoding="async" onError={() => setPhotoFailed(true)} className="aspect-[4/3] size-full object-cover" />
+              )}
               <button type="button" onClick={() => movePhoto(-1)} className="absolute left-3 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-[#FBF7EB]/95 text-[#063f2e] shadow-md" aria-label="Foto anterior"><ChevronLeft className="size-5" /></button>
               <button type="button" onClick={() => movePhoto(1)} className="absolute right-3 top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-[#FBF7EB]/95 text-[#063f2e] shadow-md" aria-label="Próxima foto"><ChevronRight className="size-5" /></button>
               <span className="absolute bottom-3 right-3 rounded-full bg-[#063f2e]/80 px-3 py-1 text-xs font-bold text-white">{photo + 1} / {property.images.length}</span>
             </div>
             <div className="mt-3 grid grid-cols-3 gap-2">
               {property.images.map((image, index) => (
-                <button key={image} type="button" onClick={() => setPhoto(index)} className={cn("overflow-hidden rounded-xl border-2", photo === index ? "border-[#FFB72B]" : "border-transparent opacity-70 hover:opacity-100")} aria-label={`Abrir foto ${index + 1}`}>
+                <button key={image} type="button" onClick={() => { setPhotoFailed(false); setPhoto(index) }} className={cn("overflow-hidden rounded-xl border-2", photo === index ? "border-[#FFB72B]" : "border-transparent opacity-70 hover:opacity-100")} aria-label={`Abrir foto ${index + 1}`}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={image} alt="" loading="lazy" decoding="async" className="aspect-[16/10] size-full object-cover" />
                 </button>
@@ -71,7 +95,10 @@ export function PropertyDetailsDialog({ property }: { property: Property }) {
             </div>
 
             <div className="mt-5 rounded-2xl border border-[#063f2e]/10 px-4 py-3 text-xs leading-relaxed text-[#60776e]">Fonte: <span className="font-bold text-[#315a4c]">{property.sourceLabel}</span>. Os dados vêm do anunciante ou da plataforma de origem.</div>
-            <Button asChild className="mt-5 h-12 w-full rounded-full bg-[#063f2e] font-extrabold text-white hover:bg-[#0B513B]"><a href={whatsappUrl} target="_blank" rel="noreferrer"><MessageCircle className="size-5 text-[#FFB72B]" /> {contactLabel}</a></Button>
+            <div className="mt-5 grid gap-2 sm:grid-cols-[auto_1fr]">
+              <Button type="button" onClick={shareProperty} variant="outline" className="h-12 rounded-full border-2 border-[#063f2e]/18 bg-transparent px-5 font-extrabold text-[#063f2e] shadow-none hover:border-[#063f2e] hover:bg-white">{copied ? <Check className="size-4 text-[#0F7352]" /> : <Share2 className="size-4" />}{copied ? "Link copiado" : "Compartilhar"}</Button>
+              <Button asChild className="h-12 rounded-full bg-[#063f2e] font-extrabold text-white hover:bg-[#0B513B]"><a href={whatsappUrl} target="_blank" rel="noreferrer"><MessageCircle className="size-5 text-[#FFB72B]" /> {contactLabel}</a></Button>
+            </div>
             <p className="mt-3 text-center text-[10px] text-[#789087]">Código do imóvel: {property.id}</p>
           </div>
         </div>

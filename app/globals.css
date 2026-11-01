@@ -123,6 +123,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .alugai-map-marker span { display: block; transform: rotate(3deg); }
 .alugai-map-marker:hover { box-shadow: 0 7px 16px rgb(6 63 46 / 30%); transform: rotate(-3deg) translateY(-3px) scale(1.05); z-index: 5; }
+.alugai-leaflet-marker-wrapper.is-active { z-index: 600 !important; }
+.alugai-leaflet-marker-wrapper.is-active .alugai-map-marker { box-shadow: 0 0 0 4px #fbf7eb, 0 0 0 7px #ffb72b, 0 8px 18px rgb(6 63 46 / 32%); transform: rotate(-3deg) translateY(-4px) scale(1.08); }
 .alugai-map-marker--owner { background: #ffb72b; color: #063f2e; }
 .alugai-map-marker--broker { background: #0f7352; }
 .alugai-map-marker--aggregated { background: #6c7b76; }

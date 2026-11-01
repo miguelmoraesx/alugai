@@ -11,21 +11,36 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 })
 
-export const PropertyCard = memo(function PropertyCard({ property, showTotal }: { property: Property; showTotal: boolean }) {
+type PropertyCardProps = {
+  property: Property
+  showTotal: boolean
+  isHighlighted?: boolean
+  onHighlight?: (propertyId: string) => void
+}
+
+export const PropertyCard = memo(function PropertyCard({ property, showTotal, isHighlighted = false, onHighlight }: PropertyCardProps) {
   const [imageIndex, setImageIndex] = useState(0)
+  const [imageFailed, setImageFailed] = useState(false)
   const [favorite, setFavorite] = useState(false)
   const total = property.rent + property.condo + property.iptu
   const whatsappText = `Olá! Vi o imóvel #${property.id} (${property.neighborhood}) no Alugaí e quero agendar uma visita.`
   const whatsappUrl = `https://wa.me/5592999999999?text=${encodeURIComponent(whatsappText)}`
-  const moveImage = (direction: number) => setImageIndex((current) => (current + direction + property.images.length) % property.images.length)
+  const moveImage = (direction: number) => {
+    setImageFailed(false)
+    setImageIndex((current) => (current + direction + property.images.length) % property.images.length)
+  }
   const isOwner = property.advertiser === "owner"
   const isBroker = property.advertiser === "broker"
 
   return (
-    <Card id={property.id} className="group scroll-mt-28 gap-0 overflow-hidden rounded-[26px] border-[#063f2e]/12 bg-[#FFFDF7] py-0 shadow-[0_6px_0_rgba(6,63,46,0.04)] transition duration-300 [contain-intrinsic-size:620px] [content-visibility:auto] hover:-translate-y-1 hover:border-[#063f2e]/25 hover:shadow-[0_12px_0_rgba(6,63,46,0.07)]">
+    <Card id={property.id} onMouseEnter={() => onHighlight?.(property.id)} onFocusCapture={() => onHighlight?.(property.id)} className={cn("group scroll-mt-28 gap-0 overflow-hidden rounded-[26px] border-[#063f2e]/12 bg-[#FFFDF7] py-0 shadow-[0_6px_0_rgba(6,63,46,0.04)] transition duration-300 [contain-intrinsic-size:620px] [content-visibility:auto] hover:-translate-y-1 hover:border-[#063f2e]/25 hover:shadow-[0_12px_0_rgba(6,63,46,0.07)]", isHighlighted && "-translate-y-1 border-[#FFB72B] ring-2 ring-[#FFB72B]/35 shadow-[0_12px_0_rgba(6,63,46,0.07)]")}>
       <div className="relative aspect-[4/3] overflow-hidden bg-[#E8E4D8]">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={property.images[imageIndex]} alt={`${property.title} em ${property.neighborhood}, foto ${imageIndex + 1}`} loading="lazy" decoding="async" className="size-full object-cover transition-transform duration-700 group-hover:scale-[1.025]" />
+        {imageFailed ? (
+          <div className="flex size-full flex-col items-center justify-center gap-2 bg-[#E8E4D8] text-sm font-bold text-[#60776e]"><Building2 className="size-7 text-[#0F7352]" /><span>Foto indisponível</span></div>
+        ) : (
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img src={property.images[imageIndex]} alt={`${property.title} em ${property.neighborhood}, foto ${imageIndex + 1}`} loading="lazy" decoding="async" onError={() => setImageFailed(true)} className="size-full object-cover transition-transform duration-700 group-hover:scale-[1.025]" />
+        )}
         <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#032b20]/45 to-transparent" />
         {isOwner ? (
           <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-[#FFB72B] px-3 py-1.5 text-[10px] font-extrabold text-[#063f2e] shadow-sm"><UserRound className="size-3.5" /> Direto com proprietário</div>
@@ -37,7 +52,7 @@ export const PropertyCard = memo(function PropertyCard({ property, showTotal }: 
         <button type="button" onClick={() => setFavorite((value) => !value)} className="absolute right-3 top-3 flex size-9 items-center justify-center rounded-full bg-[#FBF7EB] text-[#063f2e] shadow-sm transition hover:scale-105" aria-label={favorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}><Heart className={cn("size-[17px]", favorite && "fill-[#FFB72B] text-[#FFB72B]")} /></button>
         <button type="button" onClick={() => moveImage(-1)} className="absolute left-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-[#FBF7EB]/95 text-[#063f2e] opacity-0 transition group-hover:opacity-100 focus:opacity-100" aria-label="Foto anterior"><ChevronLeft className="size-4" /></button>
         <button type="button" onClick={() => moveImage(1)} className="absolute right-3 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full bg-[#FBF7EB]/95 text-[#063f2e] opacity-0 transition group-hover:opacity-100 focus:opacity-100" aria-label="Próxima foto"><ChevronRight className="size-4" /></button>
-        <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5 rounded-full bg-[#063f2e]/50 px-2 py-1.5 backdrop-blur-sm">{property.images.map((_, index) => <button key={index} type="button" onClick={() => setImageIndex(index)} className={cn("size-1.5 rounded-full bg-white/60 transition-all", imageIndex === index && "w-4 bg-[#FFB72B]")} aria-label={`Ver foto ${index + 1}`} />)}</div>
+        <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5 rounded-full bg-[#063f2e]/50 px-2 py-1.5 backdrop-blur-sm">{property.images.map((_, index) => <button key={index} type="button" onClick={() => { setImageFailed(false); setImageIndex(index) }} className={cn("size-1.5 rounded-full bg-white/60 transition-all", imageIndex === index && "w-4 bg-[#FFB72B]")} aria-label={`Ver foto ${index + 1}`} />)}</div>
       </div>
 
       <CardContent className="flex flex-1 flex-col p-5">
