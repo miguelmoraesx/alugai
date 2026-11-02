@@ -16,6 +16,26 @@ Metabuscador regional de aluguel residencial em Manaus. O MVP reúne imóveis an
 
 Os imóveis atuais são dados demonstrativos. Integrações com fontes externas e persistência de anúncios fazem parte das próximas etapas do produto.
 
+## Coletor de anúncios
+
+A [comparação de três fontes](docs/comparacao-fontes.md) já gerou 52 referências reais
+em uma base local de revisão. O relatório está em `data/review/index.html` neste checkout.
+Os dados ainda não foram publicados no frontend.
+
+O serviço Python em `alugai/` implementa descoberta e atualização de referências da OLX,
+persistência em PostgreSQL ou SQLite local, histórico de preços e exportação JSON.
+Ele roda separadamente do Next.js; os resultados ainda não alimentam a interface.
+
+Há também um provedor opcional Firecrawl e um experimento limitado a uma busca e
+dez anúncios, com relatório e repetição da mesma amostra. Veja
+[como testar o Firecrawl](docs/firecrawl.md). O teste anônimo recebeu HTTP 403 da API;
+posteriormente, o plugin autenticado conseguiu obter a página de busca da OLX.
+
+Instalação, comandos, testes e limitações estão em [docs/coletor.md](docs/coletor.md).
+O acesso HTTP direto retornou 403. O adaptador de cartões da OLX foi depois validado
+com HTML real obtido pelo plugin Firecrawl; o parser de detalhes ainda exige validação.
+O coletor interrompe a execução em bloqueios e respeita `robots.txt`.
+
 ## Tecnologias
 
 - [Next.js](https://nextjs.org/) com App Router

@@ -1,0 +1,1 @@
+"""Alugai listing collector."""
