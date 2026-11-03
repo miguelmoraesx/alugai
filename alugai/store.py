@@ -39,6 +39,15 @@ runs = Table("collector_runs", metadata,
     Column("error", Text))
 
 
+
+review_items = Table("collector_review_items", metadata,
+    Column("source", String(32), primary_key=True),
+    Column("external_id", String(64), primary_key=True),
+    Column("data", JSON, nullable=False),
+    Column("first_imported_at", String(40), nullable=False),
+    Column("last_imported_at", String(40), nullable=False))
+
+
 def now():
     return datetime.now(timezone.utc).isoformat()
 
@@ -99,6 +108,30 @@ class Store:
             db.execute(update(listings).where(key).values(last_checked_at=stamp, last_detail_checked_at=stamp,
                 last_error=error, missing_count=count,
                 status="unavailable" if count >= 2 else "pending_verification"))
+
+
+    def upsert_review_item(self, source, external_id, data):
+        stamp = now()
+        key = and_(review_items.c.source == source, review_items.c.external_id == external_id)
+        with self.engine.begin() as db:
+            old = db.execute(select(review_items).where(key)).mappings().first()
+            if old:
+                db.execute(update(review_items).where(key).values(data=data, last_imported_at=stamp))
+            else:
+                db.execute(insert(review_items).values(source=source, external_id=external_id,
+                    data=data, first_imported_at=stamp, last_imported_at=stamp))
+        return "updated" if old else "new"
+
+    def count_review_items(self, source=None):
+        with self.engine.connect() as db:
+            query = select(review_items)
+            if source:
+                query = query.where(review_items.c.source == source)
+            return sum(1 for _ in db.execute(query))
+
+    def review_data(self):
+        with self.engine.connect() as db:
+            return [row["data"] for row in db.execute(select(review_items)).mappings()]
 
     def due(self, source="olx", hours=24, limit=50):
         cutoff = (datetime.now(timezone.utc) - timedelta(hours=hours)).isoformat()

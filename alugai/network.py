@@ -23,12 +23,14 @@ class Missing(FetchError):
 
 
 class Fetcher:
-    def __init__(self, user_agent="AlugaiCollector/0.1", delay=5.0, client=None, sleep=time.sleep):
+    def __init__(self, user_agent="AlugaiCollector/0.1", delay=5.0, client=None, sleep=time.sleep,
+                 allowed_domains=("olx.com.br",)):
         self.user_agent = user_agent
         self.delay = max(2.0, delay)
         self.client = client or httpx.Client(timeout=30, follow_redirects=False,
                                              headers={"User-Agent": user_agent})
         self.sleep = sleep
+        self.allowed_domains = tuple(allowed_domains)
         self.policies = {}
         self.last_request = None
 
@@ -77,7 +79,7 @@ class Fetcher:
             raise Blocked("Página de desafio/bloqueio; execução interrompida")
 
     def rules(self, url):
-        canonical_url(url)
+        canonical_url(url, self.allowed_domains)
         parts = urlsplit(url)
         origin = f"{parts.scheme}://{parts.netloc}"
         if origin not in self.policies:
@@ -106,7 +108,7 @@ class Fetcher:
                 if not location:
                     raise FetchError("Redirecionamento sem destino")
                 url = urljoin(url, location)
-                canonical_url(url)
+                canonical_url(url, self.allowed_domains)
                 continue
             if response.status_code in (404, 410):
                 raise Missing(response.status_code)

@@ -2,7 +2,7 @@
 import os
 from pathlib import Path
 import time
-from urllib.parse import urlsplit, urldefrag
+from urllib.parse import urlsplit
 
 from bs4 import BeautifulSoup
 import httpx
@@ -30,8 +30,10 @@ def read_api_key(path=Path(".env.collector")):
 
 
 class FirecrawlFetcher(Fetcher):
-    def __init__(self, api_key=None, *, max_calls=13, client=None, sleep=time.sleep):
-        super().__init__(client=client or httpx.Client(timeout=55, follow_redirects=False), sleep=sleep)
+    def __init__(self, api_key=None, *, max_calls=13, client=None, sleep=time.sleep,
+                 allowed_domains=("olx.com.br",)):
+        super().__init__(client=client or httpx.Client(timeout=55, follow_redirects=False),
+                         sleep=sleep, allowed_domains=allowed_domains)
         self.api_key = api_key
         self.max_calls = max_calls
         self.calls = []
@@ -45,7 +47,7 @@ class FirecrawlFetcher(Fetcher):
                 "actual_billed_credits": None, "calls": self.calls}
 
     def request(self, url, delay):
-        canonical_url(url)
+        canonical_url(url, self.allowed_domains)
         if len(self.calls) >= self.max_calls:
             raise Blocked("Limite de chamadas Firecrawl atingido; nenhuma chamada extra enviada")
         if self.last_request is not None:
@@ -81,11 +83,13 @@ class FirecrawlFetcher(Fetcher):
             if type(status) is not int or status < 100 or status > 599:
                 raise FetchError("Firecrawl sem status HTTP válido da origem")
             call["target_status"] = status
+            call["scrape_id"] = metadata.get("scrapeId")
             final_url = metadata.get("url") or metadata.get("sourceURL")
             if not isinstance(final_url, str):
                 raise FetchError("Firecrawl sem URL de origem")
-            canonical_url(final_url)
-            if urldefrag(final_url)[0] != urldefrag(url)[0]:
+            canonical_url(final_url, self.allowed_domains)
+            if canonical_url(final_url, self.allowed_domains) != canonical_url(
+                    url, self.allowed_domains):
                 raise FetchError("Firecrawl informou redirecionamento; revisar destino antes de coletar")
             html = data.get("rawHtml")
             if status == 200 and (not isinstance(html, str) or not html.strip()):

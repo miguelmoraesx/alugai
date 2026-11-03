@@ -137,6 +137,51 @@ Esses comandos escrevem na fonte operacional `olx`. O agendamento Windows existe
 continua no transporte HTTP; não foi ativado nem alterado para consumir Firecrawl.
 Nenhuma assinatura, compra de créditos ou chamada recorrente foi criada.
 
+
+## Coleta de casas com IPTU explícito
+
+O comando `collect-houses` aceita `--source olx`, `--source vivareal` ou
+`--source ponta_negra`. Ele descobre candidatos pela busca da fonte,
+busca cada página de detalhe e só aceita um registro quando todas as regras são
+provadas pela própria página:
+
+- transação de aluguel residencial (não venda, temporada, comercial, etc.);
+- tipo `casa` identificado pelo campo estruturado `real_estate_type`;
+- cidade Manaus explícita;
+- aluguel numérico positivo com período mensal explícito;
+- IPTU numérico acima de R$ 1 com período explícito (mensal ou anual);
+- descrição da página de detalhe, após remover contatos e texto repetido do
+  portal, com pelo menos 120 caracteres úteis.
+
+A página de detalhe da OLX traz os dados em
+`<script id="initial-data" type="text/plain" data-json="...">`, cujo atributo é
+JSON protegido por entidades HTML (`&quot;`, `&amp;`). O BeautifulSoup já
+decodifica o atributo; o parser não aplica uma segunda decodificação antes do
+`json.loads`, evitando corromper entidades literais e sem executar o script.
+Preço, condomínio e IPTU vêm de
+`realEstatePriceInfo` (com `period` próprio); quando a periodicidade do IPTU
+não vem nesse campo, ela só é aceita se a descrição a declarar explicitamente
+(por exemplo, `Taxa de IPTU anual: R$ 550`).
+
+```powershell
+.\\.venv\Scripts\python.exe -m alugai collect-houses --max-details 30 --max-accepted 20 --max-api-calls 40
+.\\.venv\Scripts\python.exe -m alugai collect-houses --source vivareal --max-details 8 --max-accepted 5 --max-api-calls 10
+.\\.venv\Scripts\python.exe -m alugai collect-houses --source ponta_negra --max-details 8 --max-accepted 5 --max-api-calls 10
+```
+
+Limites desta execução: no máximo 40 chamadas à API, 30 detalhes inspecionados e
+20 casas aceitas. Sem repetição além de falha transitória explícita. Registros
+aceitos vão para `collector_review_items` com `observation_scope=detail_page`,
+`review_status=pending` e `publication_status=not_published`; nunca são
+publicados nem misturados aos dados demonstrativos do frontend.
+
+Os adaptadores de detalhe do Viva Real e da Ponta Negra Imóveis falham fechados
+quando não há exatamente um anúncio estruturado, ID estável, domínio esperado ou
+periodicidade explícita. O ID extraído do detalhe precisa coincidir com o cartão.
+Valores aproximados, estimados e faixas não são tratados como exatos. A validação
+ao vivo de novembro de 2026 confirmou o parser da Ponta Negra; a do Viva Real
+permanece parcial porque a execução esgotou o orçamento antes de chegar ao parser.
+
 Referências consultadas:
 [API de scrape](https://docs.firecrawl.dev/api-reference/endpoint/scrape),
 [guia de scrape](https://docs.firecrawl.dev/features/scrape) e

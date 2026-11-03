@@ -119,6 +119,16 @@ def test_unexpected_redirect_rejected():
         fetcher(lambda request: envelope("https://www.olx.com.br/login", HTML)).get(SEED)
 
 
+def test_trailing_slash_normalization_is_not_treated_as_redirect():
+    transport = fetcher(lambda request: envelope(
+        (json.loads(request.content)["url"] + "/") if not
+        json.loads(request.content)["url"].endswith("robots.txt") else
+        json.loads(request.content)["url"],
+        '<pre>User-agent: *\nAllow: /</pre>' if
+        json.loads(request.content)["url"].endswith("robots.txt") else HTML))
+    assert transport.get(SEED)[1] == SEED
+
+
 def test_key_file_does_not_execute_or_interpolate(tmp_path, monkeypatch):
     monkeypatch.delenv("FIRECRAWL_API_KEY", raising=False)
     path = tmp_path / ".env.collector"

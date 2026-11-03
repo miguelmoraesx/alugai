@@ -9,6 +9,8 @@ from .collector import execute
 from .network import Fetcher, FetchError
 from .firecrawl import FirecrawlFetcher, read_api_key
 from .probe import probe
+from .cards import SOURCES
+from .houses import collect_houses, HOUSE_SEEDS
 from .parser import SEED, LayoutError, parse_page
 from .store import Store
 
@@ -42,6 +44,12 @@ def main():
     experiment.add_argument("--max-api-calls", type=positive, default=13)
     experiment.add_argument("--output", type=Path, default=Path("data/firecrawl-probe.json"))
     experiment.add_argument("--repeat-report", type=Path)
+    houses = sub.add_parser("collect-houses", help="Casas com IPTU explícito, via Firecrawl")
+    houses.add_argument("--source", choices=sorted(SOURCES), default="olx")
+    houses.add_argument("--search-url")
+    houses.add_argument("--max-details", type=positive, default=30)
+    houses.add_argument("--max-accepted", type=positive, default=20)
+    houses.add_argument("--max-api-calls", type=positive, default=40)
     ingest = sub.add_parser("import-html", help="Validar HTML salvo sem acesso à rede")
     ingest.add_argument("path", type=Path)
     ingest.add_argument("--url", default=SEED)
@@ -78,6 +86,15 @@ def dispatch(args, store):
     if args.command == "review-snapshots":
         from .review import build_review
         return build_review(args.snapshots, args.output, args.database_url, args.limit)
+    if args.command == "collect-houses":
+        search_url = args.search_url or HOUSE_SEEDS[args.source]
+        fetcher = FirecrawlFetcher(read_api_key(), max_calls=args.max_api_calls,
+                                   allowed_domains=(SOURCES[args.source][0],))
+        try:
+            return collect_houses(store, fetcher, search_url, source=args.source,
+                                  max_details=args.max_details, max_accepted=args.max_accepted)
+        finally:
+            fetcher.close()
     if args.command == "probe-firecrawl":
         if args.output.exists():
             raise FetchError("O relatório de saída já existe; use outro nome para preservar a comparação")

@@ -14,11 +14,15 @@ class LayoutError(ValueError):
     pass
 
 
-def canonical_url(value: str) -> str:
+def canonical_url(value: str, allowed_domains=("olx.com.br",)) -> str:
+    if isinstance(allowed_domains, str):
+        allowed_domains = (allowed_domains,)
     parsed = urlsplit(value)
     host = parsed.hostname or ""
-    if parsed.scheme != "https" or not (host == "olx.com.br" or host.endswith(".olx.com.br")):
-        raise ValueError("URL fora da OLX/HTTPS")
+    allowed = any(host == domain or host.endswith("." + domain)
+                  for domain in allowed_domains)
+    if parsed.scheme != "https" or not allowed:
+        raise ValueError("URL fora do domínio HTTPS permitido")
     if parsed.username or parsed.password or parsed.port not in (None, 443):
         raise ValueError("URL com credenciais/porta não permitida")
     # Only for listing identity, never for bypassing robots on fetch URLs.

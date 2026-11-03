@@ -17,7 +17,11 @@ na branch `codex/olx-collector`. Deploy e tarefas recorrentes não foram ativado
   Viva Real e Ponta Negra Imóveis. O parser de cartões atual foi conferido nessa
   amostra: **52 referências estão na base separada de revisão**, sem publicação.
   O fallback de cartões atende à busca atual da OLX, que não usa `__NEXT_DATA__`.
-  Páginas de detalhes e disponibilidade ainda não foram verificadas. Veja a
+  Páginas de detalhes e disponibilidade ainda não foram verificadas.
+- Há parsers conservadores de páginas de detalhe para OLX, Viva Real e Ponta
+  Negra Imóveis, usados pelo comando `collect-houses` (Firecrawl). Eles aceitam
+  apenas casas com IPTU e período explícitos; veja
+  [firecrawl.md](firecrawl.md). Veja a
   [comparação das fontes e o comando de revisão](comparacao-fontes.md).
 - SQLite permite testar localmente sem serviços externos. PostgreSQL tem configuração
   e driver preparados, mas não foi testado neste ambiente: o Docker daemon está desligado.
