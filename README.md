@@ -50,12 +50,29 @@ npm run start    # executa o build de produção
 npm run lint     # análise estática do código
 ```
 
+## Coletor de anúncios (em construção)
+
+O serviço Python em `alugai/` vai obter, validar e preparar anúncios para revisão humana. Parte do trabalho de Pedro Belota na branch `codex/olx-collector`. Plano e decisões: [PLANO.md](PLANO.md) e [docs/decisoes.md](docs/decisoes.md). O site ainda usa dados demonstrativos.
+
+Requisitos: Python 3.11 ou mais recente e Docker.
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -e ".[dev]"
+set -a; . ./.env.example; set +a
+docker compose up -d --wait db
+.venv/bin/pytest -q
+```
+
+O Postgres usa a porta local `55432` por padrão. Dados coletados, HTML e fotos nunca entram no Git.
+
 ## Estrutura principal
 
 ```text
 app/                  rotas, layout e estilos globais
 components/           componentes da interface
 components/ui/        componentes reutilizáveis
+alugai/               coletor de anúncios (Python)
+docs/                 decisões e documentação do coletor
 hooks/                hooks compartilhados
 lib/properties.ts     tipos e dados demonstrativos dos imóveis
 lib/utils.ts          utilitários da aplicação

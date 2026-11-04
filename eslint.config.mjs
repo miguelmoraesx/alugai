@@ -13,6 +13,10 @@ const eslintConfig = defineConfig([
     ".sites-runtime/**",
     "outputs/**",
     "work/**",
+    ".venv/**",
+    "data/**",
+    "test-results/**",
+    "playwright-report/**",
   ]),
   {
     files: ["components/ui/**/*.{ts,tsx}", "hooks/use-mobile.ts"],

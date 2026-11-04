@@ -1,6 +1,6 @@
 # Alugaí: plano de implementação do MVP
 
-**Estado: plano aprovado pelo usuário em 2026-11-02 (checkpoints de testes e decisões). Implementação não iniciada: aguarda liberação da fase 0 e a pendência P1.** Nada foi implementado nem executado.
+**Estado: plano aprovado pelo usuário em 2026-11-02 (checkpoints de testes e decisões). Implementação em andamento: fase 0 liberada em 2026-11-03.** O andamento de cada fase é o registrado nos commits; a parte não implementada segue sem execução.
 
 ## Visão geral
 
@@ -746,9 +746,20 @@ export function seenLabel(iso: string): string                  // "Visto em 02/
 
 **Base.** Site: `main@7d5ac7f`, com só `CLAUDE.md` não rastreado no status recebido. Coletor: cópia idêntica a `origin/codex/olx-collector`, nos 107 arquivos, por `cmp` da sessão principal; `.git/packed-refs:2` traz `53a68a4`. Conferido por leitura nas revisões e confirmado por amostragem nas contestações. Âncoras reconferidas por `grep -n` antes de cada edição.
 
-**A branch `feat/catalogo-fontes-locais` nasce da `main`, que não tem coletor. Todo código Python parte de cópia com `git checkout origin/codex/olx-collector -- <arquivo>`, seguida de edição.** Linhas do coletor valem antes da edição.
+**A branch `feat/catalogo-fontes-locais` nasce da `main`, que não tem coletor. Todo código Python parte de cópia com `git checkout 53a68a4 -- <arquivo>`, seguida de edição.** Linhas do coletor valem antes da edição.
 
 **Crédito.** Commit que traz ou adapta código do Pedro: `Origem: origin/codex/olx-collector@53a68a4, <arquivo>:<linhas>` e `Co-authored-by: Pedro Belota <e-mail de git log -1 --format='%ae' origin/codex/olx-collector>`.
+
+### 7.0 Atualização de 2026-11-03: a branch do Pedro avançou
+
+A conferência `F0.1` encontrou `origin/codex/olx-collector` em `d441ad7`, um commit depois de `53a68a4`. **A base de cópia fica fixada em `53a68a4`:** todas as âncoras desta seção e o crédito continuam valendo, e os seis arquivos da fase 0 não mudaram entre os dois commits.
+
+| Arquivo em `d441ad7` | Destino | Motivo |
+|---|---|---|
+| `alugai/detail.py` | Referência, fase 3 | `parse_ponta_detail` e `sanitize_description`; o restante não foi avaliado. O texto em `docs/firecrawl.md` afirma que o leitor da Ponta Negra foi validado ao vivo; a matriz da fase 3a confere |
+| Acréscimos em `alugai/houses.py`, `cli.py` (`collect-houses`), `firecrawl.py`, `store.py`, `docs/firecrawl.md`, `tests/test_firecrawl.py` | Deixar | Coleta por Firecrawl em OLX, Viva Real e Ponta Negra, método fora do escopo [USUÁRIO]; a Ponta Negra segue no lote, pelo `Fetcher` |
+| `alugai/network.py`, `parser.py` (`allowed_domains`) | Deixar | `HostPolicy` substitui; as âncoras de 7.1 valem em `53a68a4` |
+| `tests/test_detail.py`, `test_houses.py`, `test_portal_details.py` | Referência | Casos sintéticos úteis na fase 3, reescritos com URLs `*.example` |
 
 ### 7.1 Branch do Pedro: destino de cada arquivo
 
@@ -878,7 +889,7 @@ Testes definidos na seção 10.
 
 **Objetivo.** Branch, esqueleto Python, Postgres em porta própria, bancos de teste, guardas.
 
-**Pré-requisitos.** P1, P2. Docker.
+**Pré-requisitos.** Liberação do usuário, P2, Docker.
 
 **Arquivos.** Criar: `tests/test_repo_guard.py`, `tests/conftest.py`, `tests/dbsetup.py`, `docs/decisoes.md`. Trazer/adaptar: `.gitignore`, `.env.example`, `compose.yaml`, `pyproject.toml`, `alugai/__init__.py`, `__main__.py`. Alterar: `eslint.config.mjs`, `tsconfig.json`, `README.md`.
 
@@ -887,13 +898,14 @@ Testes definidos na seção 10.
 - `F0.1` Conferir a branch:
   ```bash
   git fetch origin
-  git rev-parse origin/codex/olx-collector   # esperado: 53a68a4...; outro valor: PARAR e reconferir 7.1
+  git merge-base --is-ancestor 53a68a4 origin/codex/olx-collector   # esperado: exit 0; a branch do Pedro segue ativa e pode avançar (ver 7.0)
+  git diff --stat 53a68a4 origin/codex/olx-collector -- .gitignore .env.example compose.yaml pyproject.toml alugai/__init__.py alugai/__main__.py   # esperado: vazio; com diff: reconferir 7.1
   git merge-base --is-ancestor 7d5ac7f origin/main && git diff --stat 7d5ac7f origin/main -- app components lib package.json eslint.config.mjs tsconfig.json
   # esperado: exit 0 e diff vazio; com diff: reconferir 7.2
   # O código é trazido direto da branch; a cópia temporária usada no planejamento não é necessária.
-  git grep -n canonical_url origin/codex/olx-collector -- alugai/network.py  # esperado: linhas 8, 80, 109
+  git grep -n canonical_url 53a68a4 -- alugai/network.py  # esperado: linhas 8, 80, 109
   ```
-- `F0.2` `git switch -c feat/catalogo-fontes-locais origin/main`; publicar; `git switch -c feat/catalogo-base`.
+- `F0.2` `git switch -c feat/catalogo-base feat/catalogo-fontes-locais`; a branch de integração já foi publicada com este plano.
 - `F0.3` `T0.*` vermelhos, salvo `T0.6`. `F0.4` Trazer com crédito. `F0.5` `compose.yaml:9` → `"127.0.0.1:${ALUGAI_DB_PORT:-55432}:5432"`. `F0.6` Ignorados em eslint e tsconfig.
 
 **Contratos.** `tests.dbsetup.ensure_database(url)`: cria se ausente; recusa sem `_test`.
@@ -914,7 +926,7 @@ mkdir -p .venv/__probe && echo 'const =' > .venv/__probe/x.js; npm run lint; cod
 git check-ignore data/x .venv/x test-results/x   # esperado: as três linhas
 ```
 
-**Riscos e rollback.** `alembic`, `defusedxml` em Python 3.14 não testados. Rollback: apagar branch.
+**Riscos e rollback.** Rollback: apagar branch.
 
 **Fora.** Tabelas, rede, site. **PR.** PR-A.
 
@@ -1704,7 +1716,7 @@ Não têm como falhar antes da implementação, ou exercitam só código já pro
 | M7 | Só as views chegam ao site | `T1.10`, `T7.4` | Verde |
 | M8 | Links funcionam | `T7.19`, `T7.20` | Verde |
 | M9 | Qualidade | `pytest -q -ra`, lint, `next typegen && tsc`, build, `test:e2e` | 0 failed, 0 skipped |
-| M10 | Branch do Pedro intacta; crédito | `git rev-parse origin/codex/olx-collector` = `53a68a4...`; `for f in alugai/network.py alugai/values.py alugai/adapters/base.py alugai/review.py compose.yaml pyproject.toml .gitignore .env.example tests/test_network.py tests/test_values.py; do git log feat/catalogo-fontes-locais --format=%B -- "$f" | grep -q 'Co-authored-by: Pedro Belota' || echo "SEM CREDITO $f"; done` | Igual; sem saída |
+| M10 | Base do Pedro preservada; crédito | `git merge-base --is-ancestor 53a68a4 origin/codex/olx-collector || echo "BASE AUSENTE"`; `for f in alugai/__init__.py alugai/__main__.py alugai/network.py alugai/values.py alugai/adapters/base.py alugai/review.py compose.yaml pyproject.toml .gitignore .env.example tests/test_network.py tests/test_values.py; do git log feat/catalogo-fontes-locais --format=%B -- "$f" | grep -q 'Co-authored-by: Pedro Belota' || echo "SEM CREDITO $f"; done` | Sem saída |
 | M11 | Duplicados relatados | `alugai report`: `aprovados`, `possiveis_duplicados` | Presentes |
 | M12 | Total é útil, ou se sabe que não é | `SELECT count(*) FILTER (WHERE monthly_total IS NOT NULL), count(*) FROM published_listings;` | Só relatar (C4) |
 | M13 | Site só em loopback | `T7.27` | Verde |
@@ -1925,17 +1937,17 @@ Não pedem resposta; avise se discordar.
 
 ## 17. Pendências externas
 
-Nenhuma está resolvida.
+Nenhuma está totalmente resolvida; o estado parcial está em cada linha.
 
 | # | Pendência | Quem | Bloqueia |
 |---|---|---|---|
-| P1 | Alinhamento com Miguel e Pedro | Usuário | Fase 0 |
-| P2 | Permissão de branch e PRs em `miguelmoraesx/alugai` | Miguel | Fase 0 |
+| P1 | Alinhamento com Miguel e Pedro. Em 2026-11-03 o Pedro publicou nova coleta por Firecrawl em OLX, Viva Real e Ponta Negra (7.0), método fora do escopo deste plano. **Decisão do usuário em 2026-11-04:** os dois trabalhos seguem em paralelo, e o aproveitamento será conversado no futuro. Não bloqueia as fases 0 a 8; continua necessário antes da integração na `main` [USUÁRIO] | Usuário | Integração |
+| P2 | Permissão de abrir PR em `miguelmoraesx/alugai`. Branch e push funcionam (escrita) | Miguel | PR-A |
 | P3 | Existência de deploy da `main` | Usuário | Integração |
 | P4 | Termos dos 6 sites e reservas | Humano | Fase 3a |
 | P5 | Domínios, sitemaps, hosts, das notas da sessão principal para o TOML | Sessão principal | Fase 3a |
 | P6 | Carga de `neighborhoods` | Operador | Dados reais |
-| P7 | Docker, Compose, porta 55432, `alembic`/`defusedxml` em Python 3.14, Chromium | Operador | Fases 0, 7 |
+| P7 | Chromium. Docker, Compose, porta 55432 e `alembic`/`defusedxml` em Python 3.14.4 confirmados na fase 0; compatibilidade em uso, na fase 1 | Operador | Fases 1, 7 |
 | P8-P12 | Aviso às imobiliárias; advogado; autorização de fotos; título copiado; canal de remoção | Usuário | Tornar público |
 | P13 | Pessoa física como anunciante | Usuário | Tornar público |
 | P14 | Licença (`README.md:114`) e crédito | Miguel e Pedro | Integração |

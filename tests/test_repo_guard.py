@@ -1,5 +1,6 @@
 """Fitness checks: what may be versioned and what the collector may reference."""
 from pathlib import Path
+import re
 import subprocess
 import uuid
 
@@ -12,12 +13,29 @@ from tests.dbsetup import ensure_database
 ROOT = Path(__file__).resolve().parent.parent
 
 
+FORBIDDEN = re.compile(r"playwright|selenium|firecrawl|/_int/|olx\.com\.br|vivareal", re.I)
+HTML_FIXTURES = ("tests/fixtures/", "e2e/fixtures/")
+
+
 def scan_tracked(paths):
-    return []
+    return [path for path in paths if _forbidden_path(path)]
+
+
+def _forbidden_path(path):
+    name = path.rsplit("/", 1)[-1]
+    if path.startswith(("data/", ".venv/")):
+        return True
+    if name.lower().startswith(".env") and name != ".env.example":
+        return True
+    return name.lower().endswith(".html") and not path.startswith(HTML_FIXTURES)
 
 
 def scan_forbidden(root):
-    return []
+    root = Path(root)
+    return [path.relative_to(root).as_posix() for path in sorted((root / "alugai").rglob("*"))
+            if path.is_file() and "__pycache__" not in path.parts
+            and (FORBIDDEN.search(path.name)
+                 or FORBIDDEN.search(path.read_text(encoding="utf-8", errors="ignore")))]
 
 
 @pytest.mark.parametrize("path", [
