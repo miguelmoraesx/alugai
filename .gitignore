@@ -36,3 +36,16 @@ yarn-error.log*
 
 # OS metadata
 .DS_Store
+
+# Python collector
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+/data/
+*.log
+!.env.example
+
+# Playwright output
+test-results/
+playwright-report/
