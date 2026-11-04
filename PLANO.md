@@ -169,15 +169,15 @@ CREATE TABLE listings (
   bedrooms            SMALLINT CONSTRAINT ck_listings_bedrooms CHECK (bedrooms >= 0),
   bathrooms           SMALLINT CONSTRAINT ck_listings_bathrooms CHECK (bathrooms >= 0),
   parking_spaces      SMALLINT CONSTRAINT ck_listings_parking CHECK (parking_spaces >= 0),
-  area_m2             NUMERIC(10,2) CONSTRAINT ck_listings_area CHECK (area_m2 > 0),
-  rent_amount         NUMERIC(12,2) NOT NULL CONSTRAINT ck_listings_rent CHECK (rent_amount > 0),
+  area_m2             NUMERIC(10,2) CONSTRAINT ck_listings_area CHECK (area_m2 > 0 AND area_m2 <> 'NaN'),
+  rent_amount         NUMERIC(12,2) NOT NULL CONSTRAINT ck_listings_rent CHECK (rent_amount > 0 AND rent_amount <> 'NaN'),
   rent_period         TEXT NOT NULL
     CONSTRAINT ck_listings_rent_period CHECK (rent_period IN ('monthly','assumed_monthly','short_term','unknown')),
-  condo_amount        NUMERIC(12,2) CONSTRAINT ck_listings_condo_amount CHECK (condo_amount >= 0),
+  condo_amount        NUMERIC(12,2) CONSTRAINT ck_listings_condo_amount CHECK (condo_amount >= 0 AND condo_amount <> 'NaN'),
   condo_status        TEXT NOT NULL
     CONSTRAINT ck_listings_condo_status CHECK (condo_status IN
       ('reported','exempt','included','unknown','on_request','needs_review')),
-  iptu_amount         NUMERIC(12,2) CONSTRAINT ck_listings_iptu_amount CHECK (iptu_amount >= 0),
+  iptu_amount         NUMERIC(12,2) CONSTRAINT ck_listings_iptu_amount CHECK (iptu_amount >= 0 AND iptu_amount <> 'NaN'),
   iptu_status         TEXT NOT NULL
     CONSTRAINT ck_listings_iptu_status CHECK (iptu_status IN
       ('reported','exempt','included','unknown','on_request','needs_review')),
@@ -303,6 +303,9 @@ CREATE TABLE reviews (
     ('reported','exempt','included','unknown','on_request')),
   resolved_iptu_amount NUMERIC(12,2),
   resolved_iptu_period TEXT CONSTRAINT ck_reviews_iptu_period CHECK (resolved_iptu_period IN ('monthly','annual','unknown')),
+  CONSTRAINT ck_reviews_resolved_amounts CHECK (
+    (resolved_condo_amount IS NULL OR (resolved_condo_amount >= 0 AND resolved_condo_amount <> 'NaN'))
+    AND (resolved_iptu_amount IS NULL OR (resolved_iptu_amount >= 0 AND resolved_iptu_amount <> 'NaN'))),
   CONSTRAINT ck_reviews_reason_required CHECK (decision = 'approved' OR reason IS NOT NULL),
   CONSTRAINT ck_reviews_resolved_only_approved CHECK (decision = 'approved' OR
     (resolved_condo_status IS NULL AND resolved_iptu_status IS NULL)),
@@ -340,6 +343,8 @@ CREATE UNIQUE INDEX uq_photos_position ON listing_photos(listing_id, position) W
 ```
 
 `advertiser_type` do 01 é fixo em `agency`, sem consumidor: não vira coluna. `location_precision` fica no banco porque o 00 a lista, mas não vai ao site (seção 6.3).
+
+Atualização de 2026-11-04: a contestação da fase 1 mostrou que correção negativa ou `NaN` chegava à view com total falso (no Postgres, `NaN` é maior que tudo). Daí os CHECKs de `ck_reviews_resolved_amounts` e de `NaN` em dinheiro e área.
 
 ### 3.2 Views
 

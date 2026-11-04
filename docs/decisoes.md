@@ -35,3 +35,7 @@ Rev.: dupla = barato desfazer; única = caro. Origem: seção 2 do `PLANO.md`, a
 
 - 2026-11-03: a base de cópia do código do Pedro fica fixada em `53a68a4`, porque a branch dele avançou para `d441ad7` (`PLANO.md`, seção 7.0).
 - 2026-11-04: decisão do usuário: o trabalho do Pedro e este seguem em paralelo; o aproveitamento será conversado no futuro. O alinhamento continua necessário antes da integração na `main`.
+- 2026-11-04: D2 executa os scripts SQL das migrações por `exec_driver_sql` com `no_parameters`, no lugar de `op.execute`, para que o SQL do plano chegue ao banco literalmente. Consequência: `alembic upgrade --sql` (modo offline) não está disponível.
+- 2026-11-04: CHECKs novos em dinheiro e correções (`PLANO.md`, seção 3.1), depois que a contestação da fase 1 publicou total falso com correção negativa ou `NaN`.
+- 2026-11-04: `alugai_site` pode conectar em outros bancos do cluster local pelo `CONNECT` padrão de `PUBLIC`; não lê dado de anúncio neles. Aceito no MVP local; rever ao hospedar.
+- Fase 6: gravar `reviews` sempre com `decided_at` padrão do banco e só por inclusão. A ordem da revisão depende disso, e o banco não impede `UPDATE`.
