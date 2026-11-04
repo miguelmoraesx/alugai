@@ -8,7 +8,7 @@ import psycopg
 import pytest
 from sqlalchemy.engine import make_url
 
-from tests.dbsetup import ensure_database
+from tests.dbsetup import ensure_database, reset_schema
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -129,6 +129,16 @@ def test_t0_5_refuses_database_without_test_suffix(database):
     # A closed port proves the refusal happens before any connection.
     with pytest.raises(ValueError, match="_test"):
         ensure_database(f"postgresql+psycopg://user:pass@127.0.0.1:1/{database}")
+
+
+@pytest.mark.parametrize("function", [ensure_database, reset_schema])
+@pytest.mark.parametrize("url", [
+    "postgresql+psycopg://user:pass@127.0.0.1:1/alugai",
+    "postgresql+psycopg://user:pass@127.0.0.1:1/alugai_test?dbname=alugai",
+])
+def test_t0_5_destructive_helpers_refuse_unsafe_urls(function, url):
+    with pytest.raises(ValueError, match="_test"):
+        function(url)
 
 
 def test_t0_7_creates_database_and_is_idempotent(test_database_url):
