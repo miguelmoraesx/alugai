@@ -6,6 +6,7 @@ import type { Property } from "@/lib/properties"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { LocationInsights } from "@/components/location-insights"
 
 const money = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 })
 
@@ -95,6 +96,7 @@ export function PropertyDetailsDialog({ property }: { property: Property }) {
             </div>
 
             <div className="mt-5 rounded-2xl border border-[#063f2e]/10 px-4 py-3 text-xs leading-relaxed text-[#60776e]">Fonte: <span className="font-bold text-[#315a4c]">{property.sourceLabel}</span>. Os dados vêm do anunciante ou da plataforma de origem.</div>
+            <LocationInsights property={property} />
             <div className="mt-5 grid gap-2 sm:grid-cols-[auto_1fr]">
               <Button type="button" onClick={shareProperty} variant="outline" className="h-12 rounded-full border-2 border-[#063f2e]/18 bg-transparent px-5 font-extrabold text-[#063f2e] shadow-none hover:border-[#063f2e] hover:bg-white">{copied ? <Check className="size-4 text-[#0F7352]" /> : <Share2 className="size-4" />}{copied ? "Link copiado" : "Compartilhar"}</Button>
               <Button asChild className="h-12 rounded-full bg-[#063f2e] font-extrabold text-white hover:bg-[#0B513B]"><a href={whatsappUrl} target="_blank" rel="noreferrer"><MessageCircle className="size-5 text-[#FFB72B]" /> {contactLabel}</a></Button>

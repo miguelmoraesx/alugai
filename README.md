@@ -8,6 +8,7 @@ Metabuscador regional de aluguel residencial em Manaus. O MVP reúne imóveis an
 - Filtros rápidos para UFAM, UEA, Polo Industrial e regiões da cidade
 - Filtros por quartos, vagas de garagem e imóveis que aceitam pet
 - Mapa interativo com carregamento sob demanda
+- Pontos úteis próximos e estimativa de deslocamento para destinos pessoais
 - Identificação da origem e do tipo de anunciante
 - Comparação entre aluguel e custo mensal total
 - Galeria de fotos e detalhes do imóvel
@@ -15,6 +16,19 @@ Metabuscador regional de aluguel residencial em Manaus. O MVP reúne imóveis an
 - Layout responsivo para celular e desktop
 
 Os imóveis atuais são dados demonstrativos. Integrações com fontes externas e persistência de anúncios fazem parte das próximas etapas do produto.
+
+### Lugares próximos e deslocamento
+
+Ao abrir os detalhes de um imóvel, a interface apresenta serviços úteis próximos e
+permite comparar o deslocamento até um destino conhecido ou um ponto pessoal. O
+catálogo demonstrativo foi consultado no OpenStreetMap e o ranking considera
+distância e a categoria priorizada pelo usuário.
+
+Nesta etapa, a distância é geográfica (linha reta) e o tempo é uma estimativa por
+velocidade média para cada modal. A interface deixa essa limitação explícita: ainda
+não há rota viária, trânsito em tempo real, avaliações de estabelecimentos ou modelo
+de machine learning. Destinos pessoais são aceitos apenas em Manaus ou nos
+municípios próximos configurados e dentro de um raio regional de segurança.
 
 ## Tecnologias
 
@@ -48,6 +62,7 @@ npm run dev      # ambiente de desenvolvimento
 npm run build    # build de produção
 npm run start    # executa o build de produção
 npm run lint     # análise estática do código
+npm run test:location # testes de distância, região e ranking de pontos úteis
 ```
 
 ## Estrutura principal
